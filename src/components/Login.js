@@ -49,7 +49,7 @@ const Login = () => {
       await updateProfile(userCredential.user, {
         displayName: `${firstName} ${lastName}`,
       });
-      navigate("/LoggedIn");
+      navigate("/profile");
     } catch (error) {
       setError(error.message);
     } finally {
@@ -66,13 +66,14 @@ const Login = () => {
         await updateProfile(result.user, {
           displayName: `${firstName} ${lastName}`,
         });
+        navigate("/profile"); 
+      } else {
+        navigate("/LoggedIn");
       }
-      navigate("/LoggedIn");
     } catch (error) {
       setError(error.message);
     }
   };
-
   const handleFacebookLogin = async () => {
     const auth = getAuth();
     const provider = new FacebookAuthProvider();
@@ -82,8 +83,10 @@ const Login = () => {
         await updateProfile(result.user, {
           displayName: `${firstName} ${lastName}`,
         });
+        navigate("/profile"); 
+      } else {
+        navigate("/LoggedIn");
       }
-      navigate("/LoggedIn");
     } catch (error) {
       setError(error.message);
     }
