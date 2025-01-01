@@ -1,12 +1,23 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -15,9 +26,28 @@ const Login = () => {
     const auth = getAuth();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      console.log('Logged in');
-      console.log(auth.currentUser);
-      navigate('/LoggedIn');
+      navigate("/LoggedIn");
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    const auth = getAuth();
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      await updateProfile(userCredential.user, {
+        displayName: `${firstName} ${lastName}`,
+      });
+      navigate("/LoggedIn");
     } catch (error) {
       setError(error.message);
     } finally {
@@ -29,8 +59,13 @@ const Login = () => {
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
-      navigate('/LoggedIn');
+      const result = await signInWithPopup(auth, provider);
+      if (isSignUp) {
+        await updateProfile(result.user, {
+          displayName: `${firstName} ${lastName}`,
+        });
+      }
+      navigate("/LoggedIn");
     } catch (error) {
       setError(error.message);
     }
@@ -40,9 +75,13 @@ const Login = () => {
     const auth = getAuth();
     const provider = new FacebookAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
-      navigate('/LoggedIn');
-      console.log(auth.currentUser);
+      const result = await signInWithPopup(auth, provider);
+      if (isSignUp) {
+        await updateProfile(result.user, {
+          displayName: `${firstName} ${lastName}`,
+        });
+      }
+      navigate("/LoggedIn");
     } catch (error) {
       setError(error.message);
     }
@@ -53,14 +92,43 @@ const Login = () => {
       <div className="login-container">
         <div className="form-side">
           <div className="brand">
-            <img src="/Images/LogoApp.png" alt="Logo" className='logo-app' />
+            <img src="/Images/LogoApp.png" alt="Logo" className="logo-app" />
           </div>
-          
-          <div className="form-content">
-            <h1>Welcome back</h1>
-            <p className="subtitle">Please sign in to your account</p>
 
-            <form onSubmit={handleLogin}>
+          <div className="form-content">
+            <h1>{isSignUp ? "Sign Up" : "Welcome back"}</h1>
+            <p className="subtitle">
+              {isSignUp
+                ? "Create a new account"
+                : "Please sign in to your account"}
+            </p>
+
+            <form onSubmit={isSignUp ? handleSignUp : handleLogin}>
+              {isSignUp && (
+                <div className="name-fields">
+                  <div className="form-group">
+                    <label>First Name</label>
+                    <input
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      placeholder="Enter your first name"
+                      className="form-input"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Last Name</label>
+                    <input
+                      type="text"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      placeholder="Enter your last name"
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="form-group">
                 <label>Email</label>
                 <input
@@ -85,23 +153,60 @@ const Login = () => {
 
               {error && <div className="error-message">{error}</div>}
 
-              <button type="submit" className="submit-button" disabled={isLoading}>
-                {isLoading ? 'Signing in...' : 'Sign in'}
+              <button
+                type="submit"
+                className="submit-button"
+                disabled={isLoading}
+              >
+                {isLoading
+                  ? isSignUp
+                    ? "Signing up..."
+                    : "Signing in..."
+                  : isSignUp
+                  ? "Sign up"
+                  : "Sign in"}
               </button>
 
               <div className="social-login">
-                <button type="button" className="social-button facebook" onClick={handleFacebookLogin}>
-                  <img src="/images/facebookLogo.png" alt="Facebook logo" className='logo-login-facebook' /> Facebook
+                <button
+                  type="button"
+                  className="social-button facebook"
+                  onClick={handleFacebookLogin}
+                >
+                  <img
+                    src="/images/facebookLogo.png"
+                    alt="Facebook logo"
+                    className="logo-login-facebook"
+                  />{" "}
+                  Facebook
                 </button>
-                <button type="button" className="social-button google" onClick={handleGoogleLogin}>
-                  <img src="/images/Google.png" alt="Google logo" className='logo-login-google' /> Google
+                <button
+                  type="button"
+                  className="social-button google"
+                  onClick={handleGoogleLogin}
+                >
+                  <img
+                    src="/images/Google.png"
+                    alt="Google logo"
+                    className="logo-login-google"
+                  />{" "}
+                  Google
                 </button>
               </div>
             </form>
 
             <div className="login-footer">
-              <p>Don't have an account? <a href="#">Sign up</a></p>
-              <a href="#" className="terms">Terms & Conditions</a>
+              <p>
+                {isSignUp
+                  ? "Already have an account?"
+                  : "Don't have an account?"}{" "}
+                <a href="#" onClick={() => setIsSignUp(!isSignUp)}>
+                  {isSignUp ? "Sign in" : "Sign up"}
+                </a>
+              </p>
+              <a href="#" className="terms">
+                Terms & Conditions
+              </a>
             </div>
           </div>
         </div>
@@ -299,6 +404,18 @@ const Login = () => {
           margin-bottom: 20px;
           font-size: 14px;
           text-align: center;
+        }
+        .name-fields {
+          display: flex;
+          gap: 16px;
+        }
+
+        .name-fields .form-group {
+          flex: 1; 
+        }
+
+        .name-fields .form-input {
+          width: 83%; 
         }
 
         @media (max-width: 768px) {
