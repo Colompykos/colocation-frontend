@@ -1,9 +1,22 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Home.css';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { getAuth, signOut } from "firebase/auth";
+import "./Home.css";
 
 const Home = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      const auth = getAuth();
+      await signOut(auth);
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   return (
     <div className="home-container">
@@ -12,43 +25,84 @@ const Home = () => {
           <img src="/Images/LogoApp.png" alt="Logo" className="nav-logo" />
         </div>
         <div className="nav-links">
-          <button onClick={() => navigate('/search')} className="nav-button">Find Roommates</button>
-          <button onClick={() => navigate('/login')} className="nav-button login">Login</button>
-          <button onClick={() => navigate('/signup')} className="nav-button signup">Sign Up</button>
+          <button onClick={() => navigate("/search")} className="nav-button">
+            Find Roommates
+          </button>
+
+          {user ? (
+            <>
+              <button
+                onClick={() => navigate("/profile")}
+                className="nav-button profile"
+              >
+                My Profile
+              </button>
+              <button onClick={handleLogout} className="nav-button logout">
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => navigate("/login")}
+                className="nav-button login"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => navigate("/login?signup=true")}
+                className="nav-button signup"
+              >
+                Sign Up
+              </button>
+            </>
+          )}
         </div>
       </nav>
 
       <main className="hero-section">
         <h1>Find Your Perfect Student Housing Match</h1>
-        <p className="hero-subtitle">Connect with students, share experiences, and find your ideal coliving space</p>
-        
+        <p className="hero-subtitle">
+          Connect with students, share experiences, and find your ideal coliving
+          space
+        </p>
+
         <div className="search-preview">
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Enter your city or university"
             className="search-input"
           />
-          <button 
-            onClick={() => navigate('/search')} 
-            className="search-button"
-          >
+          <button onClick={() => navigate("/search")} className="search-button">
             Search
           </button>
         </div>
 
         <div className="features-grid">
           <div className="feature-card">
-            <img src="/images/verified.png" alt="Verified" className="feature-icon" />
+            <img
+              src="/images/verified.png"
+              alt="Verified"
+              className="feature-icon"
+            />
             <h3>Verified Profiles</h3>
             <p>All roommates are verified students</p>
           </div>
           <div className="feature-card">
-            <img src="/images/matching.png" alt="Matching" className="feature-icon" />
+            <img
+              src="/images/matching.png"
+              alt="Matching"
+              className="feature-icon"
+            />
             <h3>Smart Matching</h3>
             <p>Find compatible roommates based on your lifestyle</p>
           </div>
           <div className="feature-card">
-            <img src="/images/secure.png" alt="Secure" className="feature-icon" />
+            <img
+              src="/images/secure.png"
+              alt="Secure"
+              className="feature-icon"
+            />
             <h3>Secure Platform</h3>
             <p>Safe and secure communication</p>
           </div>

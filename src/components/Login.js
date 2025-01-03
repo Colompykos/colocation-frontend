@@ -28,7 +28,7 @@ const Login = () => {
     const auth = getAuth();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("/LoggedIn");
+      navigate("/");
     } catch (error) {
       setError(error.message);
     } finally {
@@ -68,7 +68,7 @@ const Login = () => {
         });
         navigate("/profile"); 
       } else {
-        navigate("/LoggedIn");
+        navigate("/");
       }
     } catch (error) {
       setError(error.message);
@@ -85,7 +85,7 @@ const Login = () => {
         });
         navigate("/profile"); 
       } else {
-        navigate("/LoggedIn");
+        navigate("/");
       }
     } catch (error) {
       setError(error.message);
