@@ -32,6 +32,12 @@ const Home = () => {
           {user ? (
             <>
               <button
+                onClick={() => navigate("/create-listing")}
+                className="nav-button create-listing"
+              >
+                Post Listing
+              </button>
+              <button
                 onClick={() => navigate("/profile")}
                 className="nav-button profile"
               >
@@ -112,18 +118,18 @@ const Home = () => {
       <section className="how-it-works">
         <h2>How It Works</h2>
         <div className="steps-container">
-          <div className="step">
-            <div className="step-number">1</div>
+          <div className="step-home">
+            <div className="step-home-number">1</div>
             <h3>Create Profile</h3>
             <p>Sign up and create your detailed profile</p>
           </div>
-          <div className="step">
-            <div className="step-number">2</div>
+          <div className="step-home">
+            <div className="step-home-number">2</div>
             <h3>Find Matches</h3>
             <p>Browse and connect with potential roommates</p>
           </div>
-          <div className="step">
-            <div className="step-number">3</div>
+          <div className="step-home">
+            <div className="step-home-number">3</div>
             <h3>Connect</h3>
             <p>Chat and arrange meetups with your matches</p>
           </div>
