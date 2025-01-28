@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { db } from '../../config/firebase';
 import { doc, collection, setDoc, serverTimestamp } from 'firebase/firestore';
+import axios from 'axios';
 import './CreateListing.css';
 
 // Composants pour chaque étape
@@ -126,18 +127,101 @@ const CreateListing = () => {
     setCurrentStep(prev => prev - 1);
   };
 
+  const uploadPhotosToCloudinary = async (photos) => {
+    const uploadedUrls = [];
+    const cloudinaryUrl = process.env.REACT_APP_CLOUDINARY_URL;
+    const uploadPreset = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
+    const cloudinaryApiKey = process.env.REACT_APP_CLOUDINARY_API_KEY;
+  
+    try {
+      for (const photo of photos) {
+        const formData = new FormData();
+        formData.append('file', photo);
+        formData.append('upload_preset', uploadPreset);
+        formData.append('api_key', cloudinaryApiKey);
+        formData.append('timestamp', Math.floor(Date.now() / 1000));
+  
+        const response = await axios.post(cloudinaryUrl, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
+        });
+  
+        if (response.data && response.data.secure_url) {
+          uploadedUrls.push(response.data.secure_url);
+        } else {
+          throw new Error('Invalid response from Cloudinary');
+        }
+      }
+      return uploadedUrls;
+    } catch (error) {
+      console.error('Cloudinary upload error:', error);
+      throw new Error('Erreur lors du téléchargement des photos: ' + (error.response?.data?.error?.message || error.message));
+    }
+  };
+
   const handleSubmit = async () => {
     if (!validateStep(6)) return;
 
     try {
+      // Upload photos to Cloudinary first
+      const photoUrls = await uploadPhotosToCloudinary(formData.photos);
+
+      // Create the listing document in Firestore
       const listingRef = doc(collection(db, 'listings'));
-      await setDoc(listingRef, {
-        ...formData,
-        userId: user.uid,
-        createdAt: serverTimestamp(),
-        status: 'active'
-      });
-      navigate('/');
+      const listingData = {
+        // Location
+        location: {
+          street: formData.street,
+          postalCode: formData.postalCode,
+          city: formData.city,
+          country: formData.country,
+        },
+        
+        // Housing
+        housing: {
+          totalRoommates: parseInt(formData.totalRoommates),
+          bathrooms: parseInt(formData.bathrooms),
+          privateArea: parseFloat(formData.privateArea),
+        },
+        
+        // Details
+        details: {
+          propertyType: formData.propertyType,
+          totalArea: parseFloat(formData.totalArea),
+          rooms: parseInt(formData.rooms),
+          floor: formData.floor ? parseInt(formData.floor) : null,
+          furnished: formData.furnished,
+          availableDate: formData.availableDate,
+          rent: parseFloat(formData.rent),
+          title: formData.title,
+          description: formData.description,
+        },
+        
+        // Photos
+        photos: photoUrls,
+        
+        // Services
+        services: formData.services,
+        
+        // Contact
+        contact: {
+          name: formData.contactName,
+          phone: formData.contactPhone,
+          email: formData.contactEmail,
+        },
+        
+        // Metadata
+        metadata: {
+          userId: user.uid,
+          createdAt: serverTimestamp(),
+          status: 'active',
+          updatedAt: serverTimestamp(),
+        }
+      };
+
+      await setDoc(listingRef, listingData);
+      navigate('/my-listings');
     } catch (error) {
       setError('Erreur lors de la création de l\'annonce: ' + error.message);
     }
