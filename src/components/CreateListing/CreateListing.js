@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { db } from '../../config/firebase';
-import { doc, collection, setDoc, serverTimestamp } from 'firebase/firestore';
 import axios from 'axios';
 import './CreateListing.css';
 
@@ -164,64 +162,20 @@ const CreateListing = () => {
     if (!validateStep(6)) return;
 
     try {
-      // Upload photos to Cloudinary first
       const photoUrls = await uploadPhotosToCloudinary(formData.photos);
+      const updatedFormData = { ...formData, photos: photoUrls };
 
-      // Create the listing document in Firestore
-      const listingRef = doc(collection(db, 'listings'));
-      const listingData = {
-        // Location
-        location: {
-          street: formData.street,
-          postalCode: formData.postalCode,
-          city: formData.city,
-          country: formData.country,
-        },
-        
-        // Housing
-        housing: {
-          totalRoommates: parseInt(formData.totalRoommates),
-          bathrooms: parseInt(formData.bathrooms),
-          privateArea: parseFloat(formData.privateArea),
-        },
-        
-        // Details
-        details: {
-          propertyType: formData.propertyType,
-          totalArea: parseFloat(formData.totalArea),
-          rooms: parseInt(formData.rooms),
-          floor: formData.floor ? parseInt(formData.floor) : null,
-          furnished: formData.furnished,
-          availableDate: formData.availableDate,
-          rent: parseFloat(formData.rent),
-          title: formData.title,
-          description: formData.description,
-        },
-        
-        // Photos
-        photos: photoUrls,
-        
-        // Services
-        services: formData.services,
-        
-        // Contact
-        contact: {
-          name: formData.contactName,
-          phone: formData.contactPhone,
-          email: formData.contactEmail,
-        },
-        
-        // Metadata
-        metadata: {
-          userId: user.uid,
-          createdAt: serverTimestamp(),
-          status: 'active',
-          updatedAt: serverTimestamp(),
+      const response = await axios.post('http://localhost:5000/api/listings', { formData: updatedFormData }, {
+        headers: {
+          Authorization: `Bearer ${await user.getIdToken()}`
         }
-      };
+      });
 
-      await setDoc(listingRef, listingData);
-      navigate('/my-listings');
+      if (response.data.success) {
+        navigate('/my-listings');
+      } else {
+        setError('Erreur lors de la création de l\'annonce: ' + response.data.error);
+      }
     } catch (error) {
       setError('Erreur lors de la création de l\'annonce: ' + error.message);
     }
