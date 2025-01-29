@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../config/firebase";
 import "./Login.css";
 import {
   getAuth,
@@ -62,11 +64,29 @@ const Login = () => {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
+
+      if (result.user.photoURL) {
+        try {
+          const cloudinaryUrl = await uploadAvatarToCloudinary(
+            result.user.photoURL
+          );
+          await updateProfile(result.user, {
+            photoURL: cloudinaryUrl,
+          });
+        } catch (uploadError) {
+          console.error("Failed to upload avatar:", uploadError);
+        }
+      }
+
       if (isSignUp) {
-        await updateProfile(result.user, {
-          displayName: `${firstName} ${lastName}`,
+        await setDoc(doc(db, "users", result.user.uid), {
+          displayName: result.user.displayName,
+          email: result.user.email,
+          photoURL: result.user.photoURL,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
         });
-        navigate("/profile"); 
+        navigate("/profile");
       } else {
         navigate("/");
       }
@@ -74,16 +94,35 @@ const Login = () => {
       setError(error.message);
     }
   };
+
   const handleFacebookLogin = async () => {
     const auth = getAuth();
     const provider = new FacebookAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
+
+      if (result.user.photoURL) {
+        try {
+          const cloudinaryUrl = await uploadAvatarToCloudinary(
+            result.user.photoURL
+          );
+          await updateProfile(result.user, {
+            photoURL: cloudinaryUrl,
+          });
+        } catch (uploadError) {
+          console.error("Failed to upload avatar:", uploadError);
+        }
+      }
+
       if (isSignUp) {
-        await updateProfile(result.user, {
-          displayName: `${firstName} ${lastName}`,
+        await setDoc(doc(db, "users", result.user.uid), {
+          displayName: result.user.displayName,
+          email: result.user.email,
+          photoURL: result.user.photoURL,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
         });
-        navigate("/profile"); 
+        navigate("/profile");
       } else {
         navigate("/");
       }
@@ -105,6 +144,44 @@ const Login = () => {
       alert("Password reset email sent. Please check your inbox.");
     } catch (error) {
       setError(error.message);
+    }
+  };
+
+  const uploadAvatarToCloudinary = async (imageUrl) => {
+    const auth = getAuth();
+    try {
+      const formData = new FormData();
+      formData.append('file', imageUrl);
+      formData.append(
+        "upload_preset",
+        process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+      );
+  
+      const response = await fetch(process.env.REACT_APP_CLOUDINARY_URL, {
+        method: "POST",
+        body: formData,
+      });
+  
+      const data = await response.json();
+      if (!data.secure_url) {
+        throw new Error("Failed to upload avatar to Cloudinary");
+      }
+  
+      // Sauvegarde dans Firebase
+      const userRef = doc(db, "users", auth.currentUser.uid);
+      await setDoc(
+        userRef,
+        {
+          photoURL: data.secure_url,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+  
+      return data.secure_url;
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      throw error;
     }
   };
 

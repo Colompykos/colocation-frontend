@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getAuth, updateProfile } from "firebase/auth";
-import { getStorage } from "firebase/storage";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 import "./Profile.css";
 
 const Profile = () => {
@@ -18,7 +16,6 @@ const Profile = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const auth = getAuth();
-  const storage = getStorage();
 
   useEffect(() => {
     if (auth.currentUser) {
@@ -32,30 +29,33 @@ const Profile = () => {
   const handlePhotoUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
+  
     try {
       setIsLoading(true);
+      
       const formData = new FormData();
-      formData.append("photo", file);
-
-      const response = await fetch("http://localhost:5000/api/upload/profile", {
-        method: "POST",
-        body: formData,
+      formData.append('file', file);
+      formData.append('upload_preset', process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET);
+  
+      const cloudinaryResponse = await fetch(process.env.REACT_APP_CLOUDINARY_URL, {
+        method: 'POST',
+        body: formData
       });
-
-      const data = await response.json();
-      if (!data.success) throw new Error(data.error);
-
-      // Construire l'URL complète
-      const photoURL = `http://localhost:5000${data.photoURL}`;
-
-      // Mettre à jour le profil Firebase
-      await updateProfile(auth.currentUser, { photoURL });
-
-      // Mettre à jour l'état local
-      setProfile((prev) => ({ ...prev, photoURL }));
+  
+      const cloudinaryData = await cloudinaryResponse.json();
+      if (!cloudinaryData.secure_url) {
+        throw new Error('Failed to upload to Cloudinary');
+      }
+  
+      await updateProfile(auth.currentUser, {
+        photoURL: cloudinaryData.secure_url
+      });
+  
+      setProfile(prev => ({ ...prev, photoURL: cloudinaryData.secure_url }));
       setError("");
+  
     } catch (err) {
+      console.error('Upload error:', err);
       setError("Failed to upload photo: " + err.message);
     } finally {
       setIsLoading(false);
@@ -85,13 +85,21 @@ const Profile = () => {
     setIsLoading(true);
 
     try {
-      const userRef = doc(db, "users", auth.currentUser.uid);
-      await setDoc(userRef, {
-        ...profile,
-        updatedAt: serverTimestamp(),
-      });
-      setError("");
-      navigate("/LoggedIn");
+      const token = await auth.currentUser.getIdToken();
+      const response = await axios.post('http://localhost:5000/api/profile', 
+        { profile },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.data.success) {
+        navigate("/");
+      } else {
+        setError("Failed to update profile: " + response.data.error);
+      }
     } catch (err) {
       setError("Failed to update profile: " + err.message);
     } finally {
