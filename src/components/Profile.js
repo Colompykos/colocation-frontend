@@ -24,7 +24,7 @@ const Profile = () => {
         photoURL: auth.currentUser.photoURL || "/images/default-avatar.png",
       }));
     }
-  }, []);
+  }, [auth.currentUser]);
 
   const handlePhotoUpload = async (event) => {
     const file = event.target.files[0];

@@ -1,12 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { getAuth, signOut } from "firebase/auth";
+import axios from "axios";
 import "./Home.css";
 
 const Home = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [listings, setListings] = useState([]);
+
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/listings");
+        setListings(response.data.listings);
+      } catch (error) {
+        console.error("Error fetching listings:", error);
+      }
+    };
+
+    fetchListings();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -114,6 +129,25 @@ const Home = () => {
           </div>
         </div>
       </main>
+
+      <section className="listings-section">
+        <h2>Available Listings</h2>
+        <div className="listings-grid">
+          {listings.map((listing) => (
+            <div key={listing.id} className="listing-card">
+              <img src={listing.photos[0]} alt={listing.details.title} className="listing-photo" />
+              <div className="listing-info">
+                <h3>{listing.details.title}</h3>
+                <p>{listing.details.description}</p>
+                <p><strong>Rent:</strong> ${listing.details.rent}</p>
+                <p><strong>Location:</strong> {listing.location.city}, {listing.location.country}</p>
+                <p><strong>Available Date:</strong> {listing.details.availableDate}</p>
+                <p><strong>Contact:</strong> {listing.contact.name} ({listing.contact.phone})</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <section className="how-it-works">
         <h2>How It Works</h2>
