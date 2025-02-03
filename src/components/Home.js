@@ -52,12 +52,22 @@ const Home = () => {
               >
                 Post Listing
               </button>
-              <button
-                onClick={() => navigate("/profile")}
-                className="nav-button profile"
-              >
-                My Profile
-              </button>
+              <div className="user-profile">
+                <div
+                  className="avatar-container"
+                  onClick={() => navigate("/profile")}
+                >
+                  <img
+                    src={user.photoURL || "/Images/default-avatar.png"}
+                    alt="Profile"
+                    className="avatar"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/Images/default-avatar.png";
+                    }}
+                  />
+                </div>
+              </div>
               <button onClick={handleLogout} className="nav-button logout">
                 Logout
               </button>
@@ -135,14 +145,29 @@ const Home = () => {
         <div className="listings-grid">
           {listings.map((listing) => (
             <div key={listing.id} className="listing-card">
-              <img src={listing.photos[0]} alt={listing.details.title} className="listing-photo" />
+              <img
+                src={listing.photos[0]}
+                alt={listing.details.title}
+                className="listing-photo"
+              />
               <div className="listing-info">
                 <h3>{listing.details.title}</h3>
                 <p>{listing.details.description}</p>
-                <p><strong>Rent:</strong> ${listing.details.rent}</p>
-                <p><strong>Location:</strong> {listing.location.city}, {listing.location.country}</p>
-                <p><strong>Available Date:</strong> {listing.details.availableDate}</p>
-                <p><strong>Contact:</strong> {listing.contact.name} ({listing.contact.phone})</p>
+                <p>
+                  <strong>Rent:</strong> ${listing.details.rent}
+                </p>
+                <p>
+                  <strong>Location:</strong> {listing.location.city},{" "}
+                  {listing.location.country}
+                </p>
+                <p>
+                  <strong>Available Date:</strong>{" "}
+                  {listing.details.availableDate}
+                </p>
+                <p>
+                  <strong>Contact:</strong> {listing.contact.name} (
+                  {listing.contact.phone})
+                </p>
               </div>
             </div>
           ))}
