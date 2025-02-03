@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { getAuth, updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../config/firebase";
 import axios from 'axios';
 import "./Profile.css";
 
@@ -17,8 +19,31 @@ const Profile = () => {
   const [error, setError] = useState("");
   const auth = getAuth();
 
+  const fetchUserData = async () => {
+    try {
+      const userRef = doc(db, "users", auth.currentUser.uid);
+      const userSnap = await getDoc(userRef);
+      
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+        setProfile(prev => ({
+          ...prev,
+          photoURL: userData.photoURL || auth.currentUser.photoURL || "/images/default-avatar.png",
+          budget: userData.budget || "",
+          location: userData.location || "",
+          housingType: userData.housingType || "",
+          description: userData.description || "",
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setError("Failed to load profile data");
+    }
+  };
+
   useEffect(() => {
     if (auth.currentUser) {
+      fetchUserData();
       setProfile((prev) => ({
         ...prev,
         photoURL: auth.currentUser.photoURL || "/images/default-avatar.png",
