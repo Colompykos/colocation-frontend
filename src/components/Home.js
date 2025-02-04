@@ -144,30 +144,56 @@ const Home = () => {
         <h2>Available Listings</h2>
         <div className="listings-grid">
           {listings.map((listing) => (
-            <div key={listing.id} className="listing-card">
-              <img
-                src={listing.photos[0]}
-                alt={listing.details.title}
-                className="listing-photo"
-              />
+            <div
+              key={listing.id}
+              className="listing-card"
+              onClick={() => navigate(`/listing/${listing.id}`)}
+            >
+              <div className="listing-image">
+                <img
+                  src={listing.photos[0] || "/Images/default-property.jpg"}
+                  alt={listing.details.title}
+                  className="listing-photo"
+                />
+                <div className="listing-price">
+                  €{listing.details.rent}/month
+                </div>
+              </div>
               <div className="listing-info">
                 <h3>{listing.details.title}</h3>
-                <p>{listing.details.description}</p>
-                <p>
-                  <strong>Rent:</strong> ${listing.details.rent}
-                </p>
-                <p>
-                  <strong>Location:</strong> {listing.location.city},{" "}
-                  {listing.location.country}
-                </p>
-                <p>
-                  <strong>Available Date:</strong>{" "}
-                  {listing.details.availableDate}
-                </p>
-                <p>
-                  <strong>Contact:</strong> {listing.contact.name} (
-                  {listing.contact.phone})
-                </p>
+                <div className="listing-location">
+                  <i className="fas fa-map-marker-alt"></i>
+                  {listing.location.city}, {listing.location.country}
+                </div>
+                <div className="listing-details">
+                  <span>
+                    <i className="fas fa-bed"></i>
+                    {listing.housing.totalRoommates} roommates
+                  </span>
+                  <span>
+                    <i className="fas fa-bath"></i>
+                    {listing.housing.bathrooms} baths
+                  </span>
+                  <span>
+                    <i className="fas fa-ruler-combined"></i>
+                    {listing.housing.privateArea}m²
+                  </span>
+                </div>
+                <div className="listing-services">
+                  {listing.services.wifi && (
+                    <span className="service-tag">Wifi</span>
+                  )}
+                  {listing.services.washingMachine && (
+                    <span className="service-tag">Washer</span>
+                  )}
+                  {listing.furnished && (
+                    <span className="service-tag">Furnished</span>
+                  )}
+                </div>
+                <div className="listing-available">
+                  Available from:{" "}
+                  {new Date(listing.details.availableDate).toLocaleDateString()}
+                </div>
               </div>
             </div>
           ))}

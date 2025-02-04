@@ -252,12 +252,11 @@
 .listings-section {
   padding: 80px 20px;
   background-color: #f8f9fa;
-  text-align: center;
 }
 
 .listings-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 30px;
   max-width: 1200px;
   margin: 40px auto;
@@ -265,10 +264,21 @@
 
 .listing-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  text-align: left;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.listing-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.listing-image {
+  position: relative;
+  height: 200px;
 }
 
 .listing-photo {
@@ -277,8 +287,68 @@
   object-fit: cover;
 }
 
+.listing-price {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background: #ffd60a;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #000;
+}
+
 .listing-info {
   padding: 20px;
+}
+
+.listing-info h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.listing-location {
+  color: #666;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.listing-details {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  color: #555;
+}
+
+.listing-details span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.listing-services {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.service-tag {
+  background: #f0f0f0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.listing-available {
+  font-size: 0.9rem;
+  color: #666;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
 }
 
 @media (max-width: 768px) {
