@@ -5,6 +5,7 @@ import Login from "./components/Login";
 import Profile from "./components/Profile";
 import Search from "./components/Search";
 import CreateListing from "./components/CreateListing/CreateListing";
+import ListingDetail from "./components/ListingDetail/ListingDetail";
 import { AuthProvider } from "./contexts/AuthContext";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/search" element={<Search />} />
               <Route path="/create-listing" element={<CreateListing />} />
+              <Route path="/listing/:id" element={<ListingDetail />} />
             </Routes>
           </header>
         </div>
