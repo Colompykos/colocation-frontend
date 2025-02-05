@@ -6,6 +6,7 @@ import axios from "axios";
 import "./Home.css";
 
 const Home = () => {
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
   const [listings, setListings] = useState([]);
@@ -41,7 +42,7 @@ const Home = () => {
         </div>
         <div className="nav-links">
           <button onClick={() => navigate("/search")} className="nav-button">
-            Find Roommates
+            Trouver des Colocataires
           </button>
 
           {user ? (
@@ -50,12 +51,12 @@ const Home = () => {
                 onClick={() => navigate("/create-listing")}
                 className="nav-button create-listing"
               >
-                Post Listing
+                Publier une Annonce
               </button>
               <div className="user-profile">
                 <div
                   className="avatar-container"
-                  onClick={() => navigate("/profile")}
+                  onClick={() => setShowUserMenu(!showUserMenu)}
                 >
                   <img
                     src={user.photoURL || "/Images/default-avatar.png"}
@@ -67,10 +68,46 @@ const Home = () => {
                     }}
                   />
                 </div>
+                {showUserMenu && (
+                  <div className="user-menu">
+                    <div
+                      className="user-menu-item"
+                      onClick={() => navigate("/profile")}
+                    >
+                      <i className="fas fa-user"></i>
+                      Mon Profil
+                    </div>
+                    <div
+                      className="user-menu-item"
+                      onClick={() => navigate("/my-listings")}
+                    >
+                      <i className="fas fa-list"></i>
+                      Mes Annonces
+                    </div>
+                    <div
+                      className="user-menu-item"
+                      onClick={() => navigate("/applications")}
+                    >
+                      <i className="fas fa-clipboard-list"></i>
+                      Mes Candidatures
+                    </div>
+                    <div
+                      className="user-menu-item"
+                      onClick={() => navigate("/messages")}
+                    >
+                      <i className="fas fa-envelope"></i>
+                      Messagerie
+                    </div>
+                    <div
+                      className="user-menu-item logout"
+                      onClick={handleLogout}
+                    >
+                      <i className="fas fa-sign-out-alt"></i>
+                      Déconnexion
+                    </div>
+                  </div>
+                )}
               </div>
-              <button onClick={handleLogout} className="nav-button logout">
-                Logout
-              </button>
             </>
           ) : (
             <>
@@ -78,13 +115,13 @@ const Home = () => {
                 onClick={() => navigate("/login")}
                 className="nav-button login"
               >
-                Login
+                Connexion
               </button>
               <button
                 onClick={() => navigate("/login?signup=true")}
                 className="nav-button signup"
               >
-                Sign Up
+                Inscription
               </button>
             </>
           )}
@@ -92,10 +129,10 @@ const Home = () => {
       </nav>
 
       <main className="hero-section">
-        <h1>Find Your Perfect Student Housing Match</h1>
+        <h1>Trouvez Votre Colocation Étudiante Idéale</h1>
         <p className="hero-subtitle">
-          Connect with students, share experiences, and find your ideal coliving
-          space
+          Connectez-vous avec des étudiants, partagez des expériences et trouvez
+          votre espace de coliving idéal
         </p>
 
         <div className="search-preview">
@@ -105,7 +142,7 @@ const Home = () => {
             className="search-input"
           />
           <button onClick={() => navigate("/search")} className="search-button">
-            Search
+            Rechercher
           </button>
         </div>
 
@@ -113,11 +150,11 @@ const Home = () => {
           <div className="feature-card">
             <img
               src="/images/verified.png"
-              alt="Verified"
+              alt="Vérifié"
               className="feature-icon"
             />
-            <h3>Verified Profiles</h3>
-            <p>All roommates are verified students</p>
+            <h3>Profils Vérifiés</h3>
+            <p>Tous les colocataires sont des étudiants vérifiés</p>
           </div>
           <div className="feature-card">
             <img
@@ -125,23 +162,23 @@ const Home = () => {
               alt="Matching"
               className="feature-icon"
             />
-            <h3>Smart Matching</h3>
-            <p>Find compatible roommates based on your lifestyle</p>
+            <h3>Matching Intelligent</h3>
+            <p>Trouvez des colocataires compatibles selon votre style de vie</p>
           </div>
           <div className="feature-card">
             <img
               src="/images/secure.png"
-              alt="Secure"
+              alt="Sécurisé"
               className="feature-icon"
             />
-            <h3>Secure Platform</h3>
-            <p>Safe and secure communication</p>
+            <h3>Plateforme Sécurisée</h3>
+            <p>Communication sûre et sécurisée</p>
           </div>
         </div>
       </main>
 
       <section className="listings-section">
-        <h2>Available Listings</h2>
+        <h2>Annonces Disponibles</h2>
         <div className="listings-grid">
           {listings.map((listing) => (
             <div
@@ -201,22 +238,22 @@ const Home = () => {
       </section>
 
       <section className="how-it-works">
-        <h2>How It Works</h2>
+        <h2>Comment Ça Marche</h2>
         <div className="steps-container">
           <div className="step-home">
             <div className="step-home-number">1</div>
-            <h3>Create Profile</h3>
-            <p>Sign up and create your detailed profile</p>
+            <h3>Créez votre Profil</h3>
+            <p>Inscrivez-vous et créez votre profil détaillé</p>
           </div>
           <div className="step-home">
             <div className="step-home-number">2</div>
-            <h3>Find Matches</h3>
-            <p>Browse and connect with potential roommates</p>
+            <h3>Trouvez des Correspondances</h3>
+            <p>Parcourez et connectez-vous avec des colocataires potentiels</p>
           </div>
           <div className="step-home">
             <div className="step-home-number">3</div>
-            <h3>Connect</h3>
-            <p>Chat and arrange meetups with your matches</p>
+            <h3>Connectez-vous</h3>
+            <p>Chattez et organisez des rencontres avec vos correspondances</p>
           </div>
         </div>
       </section>
@@ -224,16 +261,19 @@ const Home = () => {
       <footer className="home-footer">
         <div className="footer-content">
           <div className="footer-section">
-            <h4>About Us</h4>
-            <p>Helping students find their perfect roommates since 2024</p>
+            <h4>À Propos</h4>
+            <p>
+              Nous aidons les étudiants à trouver leurs colocataires parfaits
+              depuis 2024
+            </p>
           </div>
           <div className="footer-section">
             <h4>Contact</h4>
             <p>Email: support@miagecoloc.com</p>
-            <p>Phone: (123) 456-7890</p>
+            <p>Téléphone: (123) 456-7890</p>
           </div>
           <div className="footer-section">
-            <h4>Follow Us</h4>
+            <h4>Suivez-nous</h4>
             <div className="social-links">
               <a href="#">Facebook</a>
               <a href="#">Twitter</a>
@@ -242,7 +282,7 @@ const Home = () => {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>&copy; 2024 Your Platform. All rights reserved.</p>
+          <p>&copy; 2024 Votre Plateforme. Tous droits réservés.</p>
         </div>
       </footer>
     </div>
