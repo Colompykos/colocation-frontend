@@ -6,6 +6,7 @@ import axios from "axios";
 import "./Home.css";
 
 const Home = () => {
+  const [searchQuery, setSearchQuery] = useState("");
   const [showUserMenu, setShowUserMenu] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -32,6 +33,11 @@ const Home = () => {
     } catch (error) {
       console.error("Logout error:", error);
     }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    navigate(`/search?location=${encodeURIComponent(searchQuery)}`);
   };
 
   return (
@@ -138,10 +144,13 @@ const Home = () => {
         <div className="search-preview">
           <input
             type="text"
-            placeholder="Enter your city or university"
+            placeholder="Entrez votre ville ou université"
             className="search-input"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && handleSearch(e)}
           />
-          <button onClick={() => navigate("/search")} className="search-button">
+          <button onClick={handleSearch} className="search-button">
             Rechercher
           </button>
         </div>

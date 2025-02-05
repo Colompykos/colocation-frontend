@@ -8,8 +8,9 @@ const Search = () => {
   const [listings, setListings] = useState([]);
   const [filteredListings, setFilteredListings] = useState([]);
   const navigate = useNavigate();
+  const location = new URLSearchParams(window.location.search).get("location");
   const [filters, setFilters] = useState({
-    location: "",
+    location: location || "",
     maxBudget: "",
     propertyType: "",
     roommates: "",
@@ -28,8 +29,21 @@ const Search = () => {
     },
     sortBy: "newest",
     priceRange: [0, 5000],
-    instant: false, 
+    instant: false,
   });
+
+  useEffect(() => {
+    const initialize = async () => {
+      await fetchListings();
+      if (location) {
+        setFilters((prev) => ({
+          ...prev,
+          location: location,
+        }));
+      }
+    };
+    initialize();
+  }, [location]);
 
   const [viewMode, setViewMode] = useState("grid"); // grid ou map
   const [mapCenter, setMapCenter] = useState([48.8566, 2.3522]); // Paris par défaut
@@ -87,11 +101,15 @@ const Search = () => {
 
     // Filtre par localisation
     if (filters.location) {
-      filtered = filtered.filter((listing) =>
-        listing.location.city
+      filtered = filtered.filter((listing) => {
+        const cityMatch = listing.location.city
           .toLowerCase()
-          .includes(filters.location.toLowerCase())
-      );
+          .includes(filters.location.toLowerCase());
+        const countryMatch = listing.location.country
+          .toLowerCase()
+          .includes(filters.location.toLowerCase());
+        return cityMatch || countryMatch;
+      });
     }
 
     // Filtre par budget
