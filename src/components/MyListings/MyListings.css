@@ -1,0 +1,77 @@
+.my-listings-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.my-listings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.my-listings-header h1 {
+  font-size: 28px;
+  color: #333;
+  margin: 0;
+}
+
+.create-button {
+  padding: 12px 24px;
+  background: #ffd60a;
+  border: none;
+  border-radius: 12px;
+  color: #000;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.create-button:hover {
+  background: #ffe44d;
+  transform: translateY(-1px);
+}
+
+.no-listings {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.no-listings p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.listing-status {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+@media (max-width: 768px) {
+  .my-listings-header {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .create-button {
+    width: 100%;
+  }
+}

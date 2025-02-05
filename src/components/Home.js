@@ -6,6 +6,7 @@ import axios from "axios";
 import "./Home.css";
 
 const Home = () => {
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
   const [listings, setListings] = useState([]);
@@ -55,7 +56,7 @@ const Home = () => {
               <div className="user-profile">
                 <div
                   className="avatar-container"
-                  onClick={() => navigate("/profile")}
+                  onClick={() => setShowUserMenu(!showUserMenu)}
                 >
                   <img
                     src={user.photoURL || "/Images/default-avatar.png"}
@@ -67,10 +68,46 @@ const Home = () => {
                     }}
                   />
                 </div>
+                {showUserMenu && (
+                  <div className="user-menu">
+                    <div
+                      className="user-menu-item"
+                      onClick={() => navigate("/profile")}
+                    >
+                      <i className="fas fa-user"></i>
+                      Mon Profil
+                    </div>
+                    <div
+                      className="user-menu-item"
+                      onClick={() => navigate("/my-listings")}
+                    >
+                      <i className="fas fa-list"></i>
+                      Mes Annonces
+                    </div>
+                    <div
+                      className="user-menu-item"
+                      onClick={() => navigate("/applications")}
+                    >
+                      <i className="fas fa-clipboard-list"></i>
+                      Mes Candidatures
+                    </div>
+                    <div
+                      className="user-menu-item"
+                      onClick={() => navigate("/messages")}
+                    >
+                      <i className="fas fa-envelope"></i>
+                      Messagerie
+                    </div>
+                    <div
+                      className="user-menu-item logout"
+                      onClick={handleLogout}
+                    >
+                      <i className="fas fa-sign-out-alt"></i>
+                      Déconnexion
+                    </div>
+                  </div>
+                )}
               </div>
-              <button onClick={handleLogout} className="nav-button logout">
-                Logout
-              </button>
             </>
           ) : (
             <>
