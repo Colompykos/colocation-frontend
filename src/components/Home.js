@@ -99,6 +99,13 @@ const Home = () => {
                     </div>
                     <div
                       className="user-menu-item"
+                      onClick={() => navigate("/favorites")}
+                    >
+                      <i className="fas fa-heart"></i>
+                      Mes Favoris
+                    </div>
+                    <div
+                      className="user-menu-item"
                       onClick={() => navigate("/messages")}
                     >
                       <i className="fas fa-envelope"></i>

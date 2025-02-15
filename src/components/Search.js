@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { db } from "../config/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import FavoriteButton from './Favorites/FavoriteButton';
 import "./Search.css";
 
 const Search = () => {
@@ -302,6 +303,7 @@ const Search = () => {
                       alt={listing.details.title}
                       className="listing-photo"
                     />
+                    <FavoriteButton listingId={listing.id} />
                     <div className="listing-price">
                       €{listing.details.rent}/month
                     </div>
