@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
+import FavoriteButton from '../Favorites/FavoriteButton';
 import styles from './ListingDetail.module.css';
 
 const ListingDetail = () => {
@@ -49,6 +50,7 @@ const ListingDetail = () => {
             alt={listing.details.title}
             className={styles.mainPhoto}
           />
+          <FavoriteButton listingId={listing.id} />
           {listing.photos.length > 1 && (
             <div className={styles.photoNav}>
               <button
