@@ -4,7 +4,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import axios from 'axios';
 import './CreateListing.css';
 
-// Composants pour chaque étape
 import LocationStep from './steps/LocationStep';
 import HousingStep from './steps/HousingStep';
 import DetailsStep from './steps/DetailsStep';
@@ -27,18 +26,13 @@ const CreateListing = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
-    // Location
     street: '',
     postalCode: '',
     city: '',
     country: '',
-
-    // Housing
     totalRoommates: '',
     bathrooms: '',
     privateArea: '',
-
-    // Details
     propertyType: '',
     totalArea: '',
     rooms: '',
@@ -48,11 +42,7 @@ const CreateListing = () => {
     rent: '',
     title: '',
     description: '',
-
-    // Photos
     photos: [],
-
-    // Services
     services: {
       wifi: false,
       handicapAccess: false,
@@ -67,8 +57,6 @@ const CreateListing = () => {
       elevator: false,
       parking: false
     },
-
-    // Contact
     contactName: '',
     contactPhone: '',
     contactEmail: '',
