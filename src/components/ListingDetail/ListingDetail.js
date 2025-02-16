@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
+import { useSwipeable } from "react-swipeable";
 import FavoriteButton from '../Favorites/FavoriteButton';
 import styles from './ListingDetail.module.css';
 
@@ -11,6 +12,8 @@ const ListingDetail = () => {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -33,6 +36,35 @@ const ListingDetail = () => {
     fetchListing();
   }, [id, navigate]);
 
+  const openModal = (image) => {
+    setSelectedImage(image);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedImage(null);
+  };
+
+  const handleSwipeLeft = () => {
+    setCurrentPhotoIndex((prev) => (prev < listing.photos.length - 1 ? prev + 1 : 0));
+  };
+
+  const handleSwipeRight = () => {
+    setCurrentPhotoIndex((prev) => (prev > 0 ? prev - 1 : listing.photos.length - 1));
+  };
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: handleSwipeLeft,
+    onSwipedRight: handleSwipeRight,
+  });
+
+  useEffect(() => {
+    if (listing) {
+      setSelectedImage(listing.photos[currentPhotoIndex]);
+    }
+  }, [currentPhotoIndex, listing]);
+
   if (loading) {
     return <div className={styles.loadingState}>Loading...</div>;
   }
@@ -49,6 +81,7 @@ const ListingDetail = () => {
             src={listing.photos[currentPhotoIndex] || "/Images/default-property.jpg"}
             alt={listing.details.title}
             className={styles.mainPhoto}
+            onClick={() => openModal(listing.photos[currentPhotoIndex])}
           />
           <FavoriteButton listingId={listing.id} />
           {listing.photos.length > 1 && (
@@ -172,6 +205,31 @@ const ListingDetail = () => {
           </div>
         </div>
       </div>
+
+      {isModalOpen && (
+        <div className={styles.modal} onClick={closeModal}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <img src={selectedImage} alt="Full view" className={styles.fullImage} />
+            <button className={styles.closeButton} onClick={closeModal}>×</button>
+            {listing.photos.length > 1 && (
+              <>
+                <button
+                  onClick={handleSwipeRight}
+                  className={styles.prevButton}
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={handleSwipeLeft}
+                  className={styles.nextButton}
+                >
+                  ›
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
