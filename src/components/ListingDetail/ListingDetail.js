@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
+import FavoriteButton from '../Favorites/FavoriteButton';
 import { useSwipeable } from "react-swipeable";
 import styles from './ListingDetail.module.css';
 
@@ -82,6 +83,7 @@ const ListingDetail = () => {
             className={styles.mainPhoto}
             onClick={() => openModal(listing.photos[currentPhotoIndex])}
           />
+          <FavoriteButton listingId={listing.id} />
           {listing.photos.length > 1 && (
             <div className={styles.photoNav}>
               <button
