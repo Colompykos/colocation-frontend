@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../config/firebase";
 import { getAuth, signOut } from "firebase/auth";
 import axios from "axios";
 import "./Home.css";
@@ -8,9 +10,12 @@ import "./Home.css";
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [listings, setListings] = useState([]);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [listings, setListings] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isVerified, setIsVerified] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -40,6 +45,34 @@ const Home = () => {
     navigate(`/search?location=${encodeURIComponent(searchQuery)}`);
   };
 
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      if (!user) {
+        setIsVerified(null);
+        setIsAdmin(false);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setIsVerified(userData.isVerified || false);
+          setIsAdmin(userData.isAdmin || false);
+        }
+      } catch (error) {
+        console.error("Error checking user status:", error);
+        setIsVerified(false);
+        setIsAdmin(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkUserStatus();
+  }, [user, navigate]);
+
   return (
     <div className="home-container">
       <nav className="navbar">
@@ -51,14 +84,21 @@ const Home = () => {
             Trouver des Colocataires
           </button>
 
-          {user ? (
+          {user && !isLoading ? (
             <>
-              <button
-                onClick={() => navigate("/create-listing")}
-                className="nav-button create-listing"
-              >
-                Publier une Annonce
-              </button>
+              {isVerified ? (
+                <button
+                  onClick={() => navigate("/create-listing")}
+                  className="nav-button create-listing"
+                >
+                  Publier une Annonce
+                </button>
+              ) : (
+                <div className="verification-pending">
+                  <i className="fas fa-clock"></i>
+                  En attente de vérification de votre carte étudiante
+                </div>
+              )}
               <div className="user-profile">
                 <div
                   className="avatar-container"

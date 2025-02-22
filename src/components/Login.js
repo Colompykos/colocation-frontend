@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../config/firebase";
 import "./Login.css";
 import {
@@ -27,12 +27,54 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    const auth = getAuth();
+    setError("");
+  
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const auth = getAuth();
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+  
+      // Vérifier le statut du compte
+      const token = await user.getIdToken();
+      const response = await fetch("http://localhost:5000/api/auth/check-status", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        if (data.code === "account-blocked") {
+          await auth.signOut();
+          throw new Error("Votre compte a été bloqué. Veuillez contacter l'administrateur.");
+        }
+        throw new Error(data.error || "Erreur de connexion");
+      }
+  
+      // Vérifier si l'utilisateur est admin
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData.isAdmin) {
+          // Si admin, rediriger vers le panneau d'administration
+          navigate("/admin");
+          return;
+        }
+      }
+      
+      // Si non admin, rediriger vers la page d'accueil
       navigate("/");
+  
     } catch (error) {
+      console.error("Login error:", error);
       setError(error.message);
+  
+      if (error.message.includes("bloqué")) {
+        const auth = getAuth();
+        await auth.signOut();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -65,6 +107,28 @@ const Login = () => {
     try {
       const result = await signInWithPopup(auth, provider);
 
+      const token = await result.user.getIdToken();
+      const response = await fetch(
+        "http://localhost:5000/api/auth/check-status",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.code === "account-blocked") {
+          await auth.signOut();
+          throw new Error(
+            "Votre compte a été bloqué. Veuillez contacter l'administrateur."
+          );
+        }
+        throw new Error(data.error || "Erreur de connexion");
+      }
+
       if (result.user.photoURL) {
         try {
           const cloudinaryUrl = await uploadAvatarToCloudinary(
@@ -83,6 +147,8 @@ const Login = () => {
           displayName: result.user.displayName,
           email: result.user.email,
           photoURL: result.user.photoURL,
+          status: "pending",
+          isVerified: false,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         });
@@ -151,22 +217,22 @@ const Login = () => {
     const auth = getAuth();
     try {
       const formData = new FormData();
-      formData.append('file', imageUrl);
+      formData.append("file", imageUrl);
       formData.append(
         "upload_preset",
         process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
       );
-  
+
       const response = await fetch(process.env.REACT_APP_CLOUDINARY_URL, {
         method: "POST",
         body: formData,
       });
-  
+
       const data = await response.json();
       if (!data.secure_url) {
         throw new Error("Failed to upload avatar to Cloudinary");
       }
-  
+
       // Sauvegarde dans Firebase
       const userRef = doc(db, "users", auth.currentUser.uid);
       await setDoc(
@@ -177,10 +243,10 @@ const Login = () => {
         },
         { merge: true }
       );
-  
+
       return data.secure_url;
     } catch (error) {
-      console.error('Error uploading avatar:', error);
+      console.error("Error uploading avatar:", error);
       throw error;
     }
   };

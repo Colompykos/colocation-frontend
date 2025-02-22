@@ -6,10 +6,21 @@ import './ListingCard.css';
 const ListingCard = ({ listing, showFavorite = true, showStatus = false }) => {
   const navigate = useNavigate();
 
+  if (listing.status === 'blocked' && !showStatus) {
+    return null;
+  }
+
+  const handleClick = () => {
+    if (listing.status === 'blocked' && !showStatus) {
+      return;
+    }
+    navigate(`/listing/${listing.id}`);
+  };
+
   return (
     <div
       className="listing-card"
-      onClick={() => navigate(`/listing/${listing.id}`)}
+      onClick={handleClick}
     >
       <div className="listing-image">
         <img
@@ -22,7 +33,11 @@ const ListingCard = ({ listing, showFavorite = true, showStatus = false }) => {
           €{listing.details.rent}/month
         </div>
         {showStatus && (
-          <div className="listing-status">{listing.metadata.status}</div>
+          <div className={`listing-status ${listing.status || 'pending'}`}>
+            {listing.status === 'active' ? 'Active' :
+             listing.status === 'blocked' ? 'Bloquée' :
+             listing.status === 'pending' ? 'En attente' : 'En attente'}
+          </div>
         )}
       </div>
       <div className="listing-info">

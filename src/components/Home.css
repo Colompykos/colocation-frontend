@@ -382,6 +382,21 @@
   padding-top: 15px;
 }
 
+.verification-pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #fff7e6;
+  color: #fa8c16;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.verification-pending i {
+  font-size: 1rem;
+}
+
 @media (max-width: 768px) {
   .hero-section h1 {
     font-size: 2rem;

@@ -8,6 +8,8 @@ import CreateListing from "./components/CreateListing/CreateListing";
 import ListingDetail from "./components/ListingDetail/ListingDetail";
 import MyListings from "./components/MyListings/MyListings";
 import Favorites from "./components/Favorites/Favorites";
+import Admin from "./components/Admin/Admin";
+import PrivateAdminRoute from './components/Routes/PrivateAdminRoute';
 import { AuthProvider } from "./contexts/AuthContext";
 
 function App() {
@@ -25,6 +27,14 @@ function App() {
               <Route path="/listing/:id" element={<ListingDetail />} />
               <Route path="/my-listings" element={<MyListings />} />
               <Route path="/favorites" element={<Favorites />} />
+              <Route
+                path="/admin/*"
+                element={
+                  <PrivateAdminRoute>
+                    <Admin />
+                  </PrivateAdminRoute>
+                }
+              />
             </Routes>
           </header>
         </div>

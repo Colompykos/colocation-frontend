@@ -1,0 +1,245 @@
+.admin-listings {
+  padding: 2rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: var(--bg-darker);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.stat-card h3 {
+  color: #fff;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.stat-card .number {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.listings-section {
+  background: var(--bg-darker);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+}
+
+.listings-section h2 {
+  color: #fff;
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.listing-card-container {
+  position: relative;
+  background: var(--bg-lighter);
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.listing-card-container:hover {
+  transform: translateY(-4px);
+}
+
+.listing-admin-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-darker);
+  border-top: 1px solid var(--border-color);
+}
+
+.listing-admin-actions button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.listing-admin-actions button i {
+  font-size: 1rem;
+}
+
+.approve-button {
+  background: #10b981;
+}
+
+.approve-button:hover {
+  background: #059669;
+  transform: translateY(-2px);
+}
+
+.reject-button {
+  background: #f59e0b;
+}
+
+.reject-button:hover {
+  background: #d97706;
+  transform: translateY(-2px);
+}
+
+.delete-button {
+  background: #ef4444;
+}
+
+.delete-button:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+}
+
+.reports-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.reports-badge i {
+  color: white;
+}
+
+.listing-status-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 10;
+}
+
+.status-indicator {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: white;
+}
+
+.status-indicator.active {
+  background: #10b981;
+}
+
+.status-indicator.blocked {
+  background: #ef4444;
+}
+
+.status-indicator.pending {
+  background: #f59e0b;
+}
+
+.status-indicator.rejected {
+  background: #6b7280;
+}
+
+.listing-admin-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  padding: 1rem;
+  background: var(--bg-darker);
+  border-top: 1px solid var(--border-color);
+}
+
+.listing-admin-actions button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  position: relative;
+}
+
+.listing-admin-actions button::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #333;
+  color: white;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.listing-admin-actions button:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Override ListingCard styles */
+:global(.listing-card) {
+  background: var(--bg-lighter);
+}
+
+:global(.listing-card h3) {
+  color: #fff;
+}
+
+:global(.listing-card p) {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+@media (max-width: 768px) {
+  .admin-listings {
+    padding: 1rem;
+  }
+
+  .listings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .listing-admin-actions {
+    padding: 0.75rem;
+  }
+}

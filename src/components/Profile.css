@@ -111,6 +111,51 @@ textarea.form-input {
   text-align: center;
 }
 
+.student-card-section {
+  margin-top: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.verification-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.verification-status i {
+  font-size: 20px;
+}
+
+.verification-status.verified {
+  background: #e6f7e6;
+  color: #52c41a;
+}
+
+.verification-status.pending {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.verification-status.not-submitted {
+  background: #fff1f0;
+  color: #ff4d4f;
+}
+
+.student-card-preview {
+  margin-top: 15px;
+}
+
+.student-card-img {
+  max-width: 100%;
+  border-radius: 8px;
+  border: 1px solid #e1e1e1;
+}
+
 @media (max-width: 768px) {
   .profile-container {
     margin: 20px;
