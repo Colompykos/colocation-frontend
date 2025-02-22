@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../config/firebase';
 import axios from 'axios';
 import './CreateListing.css';
 
@@ -23,6 +25,7 @@ const stepLabels = {
 const CreateListing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [isVerified, setIsVerified] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
@@ -62,6 +65,33 @@ const CreateListing = () => {
     contactEmail: '',
     acceptTerms: false
   });
+
+    useEffect(() => {
+    const checkVerification = async () => {
+      if (!user) return;
+      
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (!userDoc.exists() || !userDoc.data().isVerified) {
+        navigate('/profile');
+      } else {
+        setIsVerified(true);
+      }
+    };
+
+    checkVerification();
+  }, [user, navigate]);
+
+  if (!user || !isVerified) {
+    return (
+      <div className="create-listing-container">
+        <h2>Accès non autorisé</h2>
+        <p>Votre compte doit être vérifié pour publier une annonce.</p>
+        <button onClick={() => navigate('/profile')} className="primary-button">
+          Retour au profil
+        </button>
+      </div>
+    );
+  }
 
   const validateStep = (step) => {
     setError('');
