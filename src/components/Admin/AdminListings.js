@@ -33,27 +33,27 @@ const AdminListings = () => {
         status: doc.data().status || "pending",
       }));
 
-      const sortedListings = sortListingsByStatus(listingsData);
+      const sortedListings = listingsData.sort((a, b) => {
+        const statusOrder = {
+          pending: 1,
+          active: 2,
+          blocked: 3,
+        };
+        return statusOrder[a.status] - statusOrder[b.status];
+      });
+
       setListings(sortedListings);
-      updateStats(listingsData);
+      setStats({
+        total: listingsData.length,
+        active: listingsData.filter((l) => l.status === "active").length,
+        reported: listingsData.filter((l) => l.reports?.length > 0).length,
+        pending: listingsData.filter((l) => l.status === "pending" || !l.status)
+          .length,
+        blocked: listingsData.filter((l) => l.status === "blocked").length,
+      });
     } catch (error) {
       console.error("Error fetching listings:", error);
     }
-  };
-
-  const sortListingsByStatus = (listings) => {
-    const statusOrder = { pending: 1, active: 2, blocked: 3 };
-    return listings.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
-  };
-
-  const updateStats = (listings) => {
-    setStats({
-      total: listings.length,
-      active: listings.filter((l) => l.status === "active").length,
-      reported: listings.filter((l) => l.reports?.length > 0).length,
-      pending: listings.filter((l) => l.status === "pending" || !l.status).length,
-      blocked: listings.filter((l) => l.status === "blocked").length,
-    });
   };
 
   const handleModerate = async (listingId, action) => {
@@ -61,56 +61,70 @@ const AdminListings = () => {
       const listingRef = doc(db, "listings", listingId);
       const timestamp = new Date();
 
-      const actionsMap = {
-        approve: {
-          status: "active",
-          isVisible: true,
-          approvedAt: timestamp,
-          updatedAt: timestamp,
-        },
-        block: {
-          status: "blocked",
-          isVisible: false,
-          blockedAt: timestamp,
-          updatedAt: timestamp,
-        },
-        unblock: {
-          status: "active",
-          isVisible: true,
-          blockedAt: null,
-          updatedAt: timestamp,
-        },
-      };
-
-      if (action === "delete") {
-        if (window.confirm("Êtes-vous sûr de vouloir supprimer cette annonce ?")) {
-          await deleteDoc(listingRef);
-        }
-      } else {
-        await updateDoc(listingRef, actionsMap[action]);
+      switch (action) {
+        case "approve":
+          await updateDoc(listingRef, {
+            status: "active",
+            isVisible: true,
+            approvedAt: timestamp,
+            updatedAt: timestamp,
+          });
+          break;
+        case "block":
+          await updateDoc(listingRef, {
+            status: "blocked",
+            isVisible: false,
+            blockedAt: timestamp,
+            updatedAt: timestamp,
+          });
+          break;
+        case "unblock":
+          await updateDoc(listingRef, {
+            status: "active",
+            isVisible: true,
+            blockedAt: null,
+            updatedAt: timestamp,
+          });
+          break;
+        case "delete":
+          if (
+            window.confirm("Êtes-vous sûr de vouloir supprimer cette annonce ?")
+          ) {
+            await deleteDoc(listingRef);
+          }
+          break;
+        default:
+          break;
       }
-
       fetchListings();
     } catch (error) {
       console.error("Error moderating listing:", error);
     }
   };
 
-  const renderStatCard = (title, value) => (
-    <div className="stat-card">
-      <h3>{title}</h3>
-      <div className="number">{value}</div>
-    </div>
-  );
-
   return (
     <div className="admin-listings">
       <div className="stats-grid">
-        {renderStatCard("Total Annonces", stats.total)}
-        {renderStatCard("Annonces Actives", stats.active)}
-        {renderStatCard("En attente", stats.pending)}
-        {renderStatCard("Bloquées", stats.blocked)}
-        {renderStatCard("Signalements", stats.reported)}
+        <div className="stat-card">
+          <h3>Total Annonces</h3>
+          <div className="number">{stats.total}</div>
+        </div>
+        <div className="stat-card">
+          <h3>Annonces Actives</h3>
+          <div className="number">{stats.active}</div>
+        </div>
+        <div className="stat-card">
+          <h3>En attente</h3>
+          <div className="number">{stats.pending}</div>
+        </div>
+        <div className="stat-card">
+          <h3>Bloquées</h3>
+          <div className="number">{stats.blocked}</div>
+        </div>
+        <div className="stat-card">
+          <h3>Signalements</h3>
+          <div className="number">{stats.reported}</div>
+        </div>
       </div>
 
       <div className="listings-section">
@@ -119,11 +133,15 @@ const AdminListings = () => {
           {listings.map((listing) => (
             <div key={listing.id} className="listing-card-container">
               <div className="listing-status-badge">
-                <span className={`status-indicator ${listing.status || "pending"}`}>
+                <span
+                  className={`status-indicator ${listing.status || "pending"}`}
+                >
                   {listing.status === "active"
                     ? "Active"
                     : listing.status === "blocked"
                     ? "Bloquée"
+                    : listing.status === "pending"
+                    ? "En attente"
                     : "En attente"}
                 </span>
               </div>

@@ -1,64 +1,58 @@
-import React from "react";
+import React from 'react';
 
-const UserRow = ({ user, onVerify, onToggleBlock, onDelete, onViewCard }) => {
-  const renderStatusBadge = () => {
-    const statusMap = {
-      blocked: "Bloqué",
-      pending: "En attente",
-      active: "Actif",
-    };
-    return (
+const UserRow = ({ user, onVerify, onToggleBlock, onDelete, onViewCard }) => (
+  <tr>
+    <td>{user.displayName || "N/A"}</td>
+    <td>{user.email}</td>
+    <td>
       <span className={`status-badge ${user.status || "active"}`}>
-        {statusMap[user.status] || "Actif"}
+        {user.status === "blocked" 
+          ? "Bloqué" 
+          : user.status === "pending" 
+          ? "En attente" 
+          : "Actif"}
       </span>
-    );
-  };
-
-  const renderStudentCardButton = () => {
-    return user.studentCardURL ? (
-      <button
-        className="view-card-button"
-        onClick={() => onViewCard(user.studentCardURL)}
-      >
-        <i className="fas fa-id-card"></i> Voir la carte
-      </button>
-    ) : (
-      <span className="no-card">Non fournie</span>
-    );
-  };
-
-  return (
-    <tr>
-      <td>{user.displayName || "N/A"}</td>
-      <td>{user.email}</td>
-      <td>{renderStatusBadge()}</td>
-      <td>{renderStudentCardButton()}</td>
-      <td className="actions-cell">
-        {user.status === "pending" && (
-          <button onClick={() => onVerify(user.id)} className="verify-button">
-            <i className="fas fa-check"></i> Vérifier
-          </button>
-        )}
+    </td>
+    <td>
+      {user.studentCardURL ? (
         <button
-          onClick={() => onToggleBlock(user.id, user.status !== "blocked")}
-          className={`block-button ${
-            user.status === "blocked" ? "unblock" : ""
-          }`}
+          className="view-card-button"
+          onClick={() => onViewCard(user.studentCardURL)}
         >
-          <i
-            className={`fas fa-${
-              user.status === "blocked" ? "unlock" : "lock"
-            }`}
-          ></i>
-          {user.status === "blocked" ? "Débloquer" : "Bloquer"}
+          <i className="fas fa-id-card"></i>
+          Voir la carte
         </button>
-        <button onClick={() => onDelete(user.id)} className="delete-button">
-          <i className="fas fa-trash"></i> Supprimer
+      ) : (
+        <span className="no-card">Non fournie</span>
+      )}
+    </td>
+    <td className="actions-cell">
+      {user.status === "pending" && (
+        <button
+          onClick={() => onVerify(user.id)}
+          className="verify-button"
+        >
+          <i className="fas fa-check"></i>
+          Vérifier
         </button>
-      </td>
-    </tr>
-  );
-};
+      )}
+      <button
+        onClick={() => onToggleBlock(user.id, user.status !== "blocked")}
+        className={`block-button ${user.status === "blocked" ? "unblock" : ""}`}
+      >
+        <i className={`fas fa-${user.status === "blocked" ? "unlock" : "lock"}`}></i>
+        {user.status === "blocked" ? "Débloquer" : "Bloquer"}
+      </button>
+      <button
+        onClick={() => onDelete(user.id)}
+        className="delete-button"
+      >
+        <i className="fas fa-trash"></i>
+        Supprimer
+      </button>
+    </td>
+  </tr>
+);
 
 const UserTable = ({
   users,
@@ -68,19 +62,6 @@ const UserTable = ({
   onDelete,
   onViewCard,
 }) => {
-  const renderTableRows = () => {
-    return [...pendingUsers, ...users].map((user) => (
-      <UserRow
-        key={user.id}
-        user={user}
-        onVerify={onVerify}
-        onToggleBlock={onToggleBlock}
-        onDelete={onDelete}
-        onViewCard={onViewCard}
-      />
-    ));
-  };
-
   return (
     <div className="users-table">
       <table>
@@ -93,7 +74,18 @@ const UserTable = ({
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>{renderTableRows()}</tbody>
+        <tbody>
+          {[...pendingUsers, ...users].map((user) => (
+            <UserRow
+              key={user.id}
+              user={user}
+              onVerify={onVerify}
+              onToggleBlock={onToggleBlock}
+              onDelete={onDelete}
+              onViewCard={onViewCard}
+            />
+          ))}
+        </tbody>
       </table>
     </div>
   );
