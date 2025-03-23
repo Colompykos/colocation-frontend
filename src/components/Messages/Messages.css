@@ -1,6 +1,6 @@
 .messages-container {
   display: flex;
-  height: 100vh; 
+  height: calc(100vh - 73px - 0.5rem); 
   width: 100%;
   max-width: 100%;
   margin: 0;
