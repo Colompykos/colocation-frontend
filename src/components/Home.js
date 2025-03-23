@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  onSnapshot  // Ajout de l'import manquant
+} from "firebase/firestore";
 import { db } from "../config/firebase";
 import { getAuth, signOut } from "firebase/auth";
+import { useRef } from "react";
 import axios from "axios";
 import "./Home.css";
 
@@ -16,6 +25,8 @@ const Home = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isVerified, setIsVerified] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const chatUnreadCounts = useRef({});
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -72,6 +83,46 @@ const Home = () => {
 
     checkUserStatus();
   }, [user, navigate]);
+
+  useEffect(() => {
+    if (!user) {
+      setUnreadCount(0);
+      return;
+    }
+
+    const chatsQuery = query(
+      collection(db, "chats"),
+      where("participants", "array-contains", user.uid)
+    );
+
+    const unsubscribe = onSnapshot(chatsQuery, async (snapshot) => {
+      try {
+        let totalUnread = 0;
+
+        const countPromises = snapshot.docs.map(async (chatDoc) => {
+          const chatId = chatDoc.id;
+
+          const unreadQuery = query(
+            collection(db, "chats", chatId, "messages"),
+            where("senderId", "!=", user.uid),
+            where("read", "==", false)
+          );
+
+          const messagesSnap = await getDocs(unreadQuery);
+          return messagesSnap.size;
+        });
+
+        const counts = await Promise.all(countPromises);
+        totalUnread = counts.reduce((sum, count) => sum + count, 0);
+
+        setUnreadCount(totalUnread);
+      } catch (error) {
+        console.error("Error counting unread messages:", error);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user]);
 
   return (
     <div className="home-container">
@@ -150,7 +201,21 @@ const Home = () => {
                     >
                       <i className="fas fa-envelope"></i>
                       Messagerie
+                      {unreadCount > 0 && (
+                        <span className="notification-badge">
+                          {unreadCount}
+                        </span>
+                      )}
                     </div>
+                    {isAdmin && (
+                      <div
+                        className="user-menu-item admin"
+                        onClick={() => navigate("/admin")}
+                      >
+                        <i className="fas fa-shield-alt"></i>
+                        Admin Dashboard
+                      </div>
+                    )}
                     <div
                       className="user-menu-item logout"
                       onClick={handleLogout}

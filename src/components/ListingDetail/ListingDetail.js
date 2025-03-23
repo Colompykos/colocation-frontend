@@ -80,7 +80,6 @@ const ListingDetail = () => {
     try {
       const listingRef = doc(db, "listings", id);
 
-      // Ajouter le signalement avec plus d'informations
       await updateDoc(listingRef, {
         reports: arrayUnion({
           userId: user.uid,
@@ -275,19 +274,43 @@ const ListingDetail = () => {
           <h3>Description</h3>
           <p>{listing.details.description}</p>
         </div>
-
         <div className={styles.contactSection}>
           <h3>Contact</h3>
           <div className={styles.contactGrid}>
-            <p>
-              <i className="fas fa-user"></i> {listing.contact.name}
-            </p>
-            <p>
-              <i className="fas fa-phone"></i> {listing.contact.phone}
-            </p>
-            <p>
-              <i className="fas fa-envelope"></i> {listing.contact.email}
-            </p>
+            <div className={styles.contactInfo}>
+              <p>
+                <i className="fas fa-user"></i> {listing.contact.name}
+              </p>
+              <p>
+                <i className="fas fa-phone"></i> {listing.contact.phone}
+              </p>
+              <p>
+                <i className="fas fa-envelope"></i> {listing.contact.email}
+              </p>
+            </div>
+            <div className={styles.contactActions}>
+              {user ? (
+                user.uid !== listing.metadata.userId ? (
+                  <button
+                    className={styles.chatButton}
+                    onClick={() => navigate(`/messages?recipientId=${listing.metadata.userId}`)}
+                  >
+                    <i className="fas fa-comments"></i> Message
+                  </button>
+                ) : (
+                  <div className={styles.ownListingNotice}>
+                    <i className="fas fa-info-circle"></i> This is your listing
+                  </div>
+                )
+              ) : (
+                <button
+                  className={styles.chatButton}
+                  onClick={() => navigate(`/login?redirect=/listing/${id}`)}
+                >
+                  <i className="fas fa-sign-in-alt"></i> Login to contact
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

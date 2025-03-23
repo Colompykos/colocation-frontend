@@ -11,6 +11,7 @@ import Favorites from "./components/Favorites/Favorites";
 import Admin from "./components/Admin/Admin";
 import PrivateAdminRoute from './components/Routes/PrivateAdminRoute';
 import { AuthProvider } from "./contexts/AuthContext";
+import Messages from "./components/Messages/Messages";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/search" element={<Search />} />
+              <Route path="/messages" element={<Messages />} />
               <Route path="/create-listing" element={<CreateListing />} />
               <Route path="/listing/:id" element={<ListingDetail />} />
               <Route path="/my-listings" element={<MyListings />} />
