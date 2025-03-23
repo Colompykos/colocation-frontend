@@ -10,35 +10,41 @@ import MyListings from "./components/MyListings/MyListings";
 import Favorites from "./components/Favorites/Favorites";
 import Admin from "./components/Admin/Admin";
 import PrivateAdminRoute from './components/Routes/PrivateAdminRoute';
+import Layout from "./components/Layout/Layout";
 import { AuthProvider } from "./contexts/AuthContext";
 import Messages from "./components/Messages/Messages";
+ {/*import Applo from "./components/Applications/Applications";*/}
 
 function App() {
   return (
     <Router>
       <AuthProvider>
         <div className="App">
-          <header className="App-header">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/messages" element={<Messages />} />
-              <Route path="/create-listing" element={<CreateListing />} />
-              <Route path="/listing/:id" element={<ListingDetail />} />
-              <Route path="/my-listings" element={<MyListings />} />
-              <Route path="/favorites" element={<Favorites />} />
-              <Route
-                path="/admin/*"
-                element={
-                  <PrivateAdminRoute>
-                    <Admin />
-                  </PrivateAdminRoute>
-                }
-              />
-            </Routes>
-          </header>
+          <Routes>
+            {/* Routes that don't use the common layout */}
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/admin/*"
+              element={
+                <PrivateAdminRoute>
+                  <Admin />
+                </PrivateAdminRoute>
+              }
+            />
+            
+            {/* Routes with the common layout */}
+            <Route path="/" element={<Layout><Home /></Layout>} />
+            <Route path="/profile" element={<Layout><Profile /></Layout>} />
+            <Route path="/search" element={<Layout><Search /></Layout>} />
+            <Route path="/messages" element={<Layout><Messages /></Layout>} />
+            <Route path="/create-listing" element={<Layout><CreateListing /></Layout>} />
+            <Route path="/listing/:id" element={<Layout><ListingDetail /></Layout>} />
+            <Route path="/my-listings" element={<Layout><MyListings /></Layout>} />
+            <Route path="/favorites" element={<Layout><Favorites /></Layout>} />
+ {/*
+           <Route path="/applications" element={<Layout><Applications/></Layout>} />*/}
+
+          </Routes>
         </div>
       </AuthProvider>
     </Router>
