@@ -28,33 +28,42 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-  
+
     try {
       const auth = getAuth();
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
-  
+
       // Vérifier le statut du compte
       const token = await user.getIdToken();
-      const response = await fetch("http://localhost:5000/api/auth/check-status", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-  
+      const response = await fetch(
+        "http://localhost:5000/api/auth/check-status",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       const data = await response.json();
-  
+
       if (!response.ok) {
         if (data.code === "account-blocked") {
           await auth.signOut();
-          throw new Error("Votre compte a été bloqué. Veuillez contacter l'administrateur.");
+          throw new Error(
+            "Votre compte a été bloqué. Veuillez contacter l'administrateur."
+          );
         }
         throw new Error(data.error || "Erreur de connexion");
       }
-  
+
       // Vérifier si l'utilisateur est admin
       const userDoc = await getDoc(doc(db, "users", user.uid));
-      
+
       if (userDoc.exists()) {
         const userData = userDoc.data();
         if (userData.isAdmin) {
@@ -63,14 +72,13 @@ const Login = () => {
           return;
         }
       }
-      
+
       // Si non admin, rediriger vers la page d'accueil
       navigate("/");
-  
     } catch (error) {
       console.error("Login error:", error);
       setError(error.message);
-  
+
       if (error.message.includes("bloqué")) {
         const auth = getAuth();
         await auth.signOut();
@@ -154,6 +162,15 @@ const Login = () => {
         });
         navigate("/profile");
       } else {
+        await setDoc(
+          doc(db, "users", result.user.uid),
+          {
+            displayName: result.user.displayName,
+            email: result.user.email,
+            updatedAt: serverTimestamp(),
+          },
+          { merge: true }
+        );
         navigate("/");
       }
     } catch (error) {
@@ -185,11 +202,22 @@ const Login = () => {
           displayName: result.user.displayName,
           email: result.user.email,
           photoURL: result.user.photoURL,
+          status: "pending",
+          isVerified: false,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         });
         navigate("/profile");
       } else {
+        await setDoc(
+          doc(db, "users", result.user.uid),
+          {
+            displayName: result.user.displayName,
+            email: result.user.email,
+            updatedAt: serverTimestamp(),
+          },
+          { merge: true }
+        );
         navigate("/");
       }
     } catch (error) {

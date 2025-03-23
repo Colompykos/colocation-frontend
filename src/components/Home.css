@@ -412,3 +412,36 @@
     padding: 0 20px;
   }
 }
+
+.notification-badge {
+  background-color: #ff4d4f;
+  color: white;
+  font-size: 0.75rem;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  margin-left: auto;
+  font-weight: bold;
+}
+
+.user-menu-item .notification-badge {
+  position: relative;
+  top: -1px;
+}
+
+.user-menu-item.admin {
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.user-menu-item.admin i {
+  color: #1890ff;
+}
+
+.user-menu-item.admin:hover {
+  background-color: #e6f7ff;
+}
