@@ -1,34 +1,36 @@
 .detailContainer {
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 0 20px;
-  font-family: 'Arial', sans-serif;
+  max-width: 1280px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-family: 'Inter', sans-serif;
+  color: #1f2a44;
 }
 
 .gallerySection {
-  margin-bottom: 40px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2.5rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
   overflow: hidden;
 }
 
 .mainPhotoContainer {
   position: relative;
   width: 100%;
-  height: 500px;
-  overflow: hidden;
+  height: 550px;
+  background: #f5f5f5;
 }
 
 .mainPhoto {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: all 0.4s ease;
 }
 
 .mainPhoto:hover {
-  transform: scale(1.02);
+  transform: scale(1.03);
+  filter: brightness(1.05);
 }
 
 .photoNav {
@@ -38,75 +40,85 @@
   right: 0;
   display: flex;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 1.5rem;
   transform: translateY(-50%);
 }
 
 .navButton {
-  background: rgba(52, 58, 64, 0.8); /* Gris foncé de la navbar */
-  color: #fff;
+  background: rgba(255, 255, 255, 0.9);
+  color: #2d3748;
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 24px;
+  width: 48px;
+  height: 48px;
+  font-size: 1.5rem;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .navButton:hover {
-  background: #343a40;
+  background: #ffffff;
+  transform: scale(1.1);
 }
 
 .thumbnailGrid {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
-  padding: 10px;
-  overflow-x: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 100px);
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #fafafa;
 }
 
 .thumbnail {
-  width: 90px;
-  height: 90px;
+  width: 100px;
+  height: 100px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .thumbnail:hover {
-  transform: scale(1.05);
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .activeThumbnail {
-  border: 3px solid #007bff; /* Bleu pour cohérence */
+  border: 3px solid #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 .contentSection {
-  padding: 25px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
 }
 
 .headerSection {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 2rem;
+  gap: 1rem;
 }
 
 .title {
-  font-size: 2rem;
-  color: #343a40; /* Gris foncé pour le titre */
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #1f2a44;
   margin: 0;
 }
 
 .priceTag {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 600;
-  color: #007bff; /* Bleu pour le prix */
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
 }
 
 .locationSection h3,
@@ -114,109 +126,131 @@
 .amenitiesSection h3,
 .descriptionSection h3,
 .contactSection h3 {
-  color: #343a40;
-  margin-bottom: 15px;
-  font-size: 1.25rem;
+  color: #1f2a44;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .featuresGrid,
 .detailsGrid,
 .amenitiesGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 15px;
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 12px;
 }
 
 .featureItem,
 .amenityItem {
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: #333;
+  gap: 0.75rem;
+  color: #4b5563;
+  font-size: 1rem;
 }
 
 .featureItem i,
 .amenityItem i {
-  color: #007bff; /* Bleu pour les icônes */
+  color: #3b82f6;
+  font-size: 1.25rem;
 }
 
 .contactSection {
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 10px;
-  margin-top: 30px;
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-top: 2rem;
+}
+
+.reportSection {
+  padding: 1rem;
+  text-align: right;
 }
 
 .reportButton {
-  background: #ef4444;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  color: #ef4444;
+  border: 2px solid #ef4444;
+  padding: 0.75rem 1.5rem;
   border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .reportButton:hover {
-  background: #dc2626;
+  background: #ef4444;
+  color: #ffffff;
+  transform: translateY(-2px);
 }
 
-/* Modal */
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.85);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1000;
 }
 
 .fullImage {
-  max-width: 85vw;
-  max-height: 85vh;
+  max-width: 90vw;
+  max-height: 90vh;
   border-radius: 12px;
+  object-fit: contain;
 }
 
 .closeButton {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  font-size: 2rem;
-  color: #fff;
-  background: none;
+  top: 1rem;
+  right: 1rem;
+  font-size: 2.5rem;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.5);
   border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.closeButton:hover {
+  background: rgba(0, 0, 0, 0.8);
 }
 
 .floatingMessageButton {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
+  bottom: 2rem;
+  right: 2rem;
   z-index: 100;
 }
 
 .chatButton {
-  background: #007bff;
-  color: #fff;
+  background: #3b82f6;
+  color: #ffffff;
   border: none;
   border-radius: 50px;
-  padding: 12px 25px;
+  padding: 0.75rem 1.75rem;
   font-size: 1rem;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
 }
 
 .chatButton:hover {
-  background: #0056b3;
-  transform: translateY(-2px);
+  background: #2563eb;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
