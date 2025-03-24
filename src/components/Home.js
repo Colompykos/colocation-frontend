@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
 import axios from "axios";
 import "./Home.css";
 
@@ -8,20 +7,19 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [listings, setListings] = useState([]);
   const navigate = useNavigate();
-  const { user } = useAuth();
+
+  const fetchListings = useCallback(async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/listings");
+      setListings(response.data.listings);
+    } catch (error) {
+      console.error("Error fetching listings:", error);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/listings");
-        setListings(response.data.listings);
-      } catch (error) {
-        console.error("Error fetching listings:", error);
-      }
-    };
-
     fetchListings();
-  }, []);
+  }, [fetchListings]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -180,9 +178,9 @@ const Home = () => {
           <div className="footer-section">
             <h4>Suivez-nous</h4>
             <div className="social-links">
-              <a href="#">Facebook</a>
-              <a href="#">Twitter</a>
-              <a href="#">Instagram</a>
+              <a href="https://www.facebook.com/miagecoloc" target="_blank" rel="noopener noreferrer">Facebook</a>
+              <a href="https://www.twitter.com/miagecoloc" target="_blank" rel="noopener noreferrer">Twitter</a>
+              <a href="https://www.instagram.com/miagecoloc" target="_blank" rel="noopener noreferrer">Instagram</a>
             </div>
           </div>
         </div>

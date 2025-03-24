@@ -16,7 +16,6 @@ import {
   getDocs, 
   getDoc, 
   updateDoc, 
-  arrayUnion
 } from "firebase/firestore";
 
 const Messages = () => {
