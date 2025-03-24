@@ -1,12 +1,16 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../contexts/AuthContext";
+import LoginPopup from "./LoginPopup/LoginPopup";
 import "./Home.css";
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [listings, setListings] = useState([]);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const fetchListings = useCallback(async () => {
     try {
@@ -23,6 +27,12 @@ const Home = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
+    
+    if (!user) {
+      setShowLoginPopup(true);
+      return;
+    }
+    
     if (searchQuery.trim()) {
       navigate(`/search?location=${encodeURIComponent(searchQuery.trim())}`);
     } else {
@@ -30,8 +40,18 @@ const Home = () => {
     }
   };
 
+  const handleListingClick = (listingId) => {
+    if (!user) {
+      setShowLoginPopup(true);
+      return;
+    }
+    navigate(`/listing/${listingId}`);
+  };
+
   return (
     <div className="home-container">
+      {showLoginPopup && <LoginPopup onClose={() => setShowLoginPopup(false)} />}
+      
       <main className="hero-section">
         <h1>Trouvez Votre Colocation Étudiante Idéale</h1>
         <p className="hero-subtitle">
@@ -49,9 +69,9 @@ const Home = () => {
             onKeyDown={(e) => e.key === "Enter" && handleSearch(e)}
           />
         </div>
-          <button onClick={handleSearch} className="search-button">
-            Rechercher
-          </button>
+        <button onClick={handleSearch} className="search-button">
+          Rechercher
+        </button>
 
         <div className="features-grid">
           <div className="feature-card">
@@ -91,7 +111,7 @@ const Home = () => {
             <div
               key={listing.id}
               className="listing-card"
-              onClick={() => navigate(`/listing/${listing.id}`)}
+              onClick={() => handleListingClick(listing.id)}
             >
               <div className="listing-image">
                 <img

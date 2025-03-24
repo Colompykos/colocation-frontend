@@ -1,5 +1,5 @@
 import "./config/firebase.js";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import Profile from "./components/Profile";
@@ -11,9 +11,22 @@ import Favorites from "./components/Favorites/Favorites";
 import Admin from "./components/Admin/Admin";
 import PrivateAdminRoute from './components/Routes/PrivateAdminRoute';
 import Layout from "./components/Layout/Layout";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Messages from "./components/Messages/Messages";
  {/*import Applo from "./components/Applications/Applications";*/}
+
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) return <div className="loading">Loading...</div>;
+  
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
 
 function App() {
   return (
@@ -34,16 +47,43 @@ function App() {
             
             {/* Routes with the common layout */}
             <Route path="/" element={<Layout><Home /></Layout>} />
-            <Route path="/profile" element={<Layout><Profile /></Layout>} />
-            <Route path="/search" element={<Layout><Search /></Layout>} />
-            <Route path="/messages" element={<Layout><Messages /></Layout>} />
-            <Route path="/create-listing" element={<Layout><CreateListing /></Layout>} />
-            <Route path="/listing/:id" element={<Layout><ListingDetail /></Layout>} />
-            <Route path="/my-listings" element={<Layout><MyListings /></Layout>} />
-            <Route path="/favorites" element={<Layout><Favorites /></Layout>} />
- {/*
-           <Route path="/applications" element={<Layout><Applications/></Layout>} />*/}
-
+            
+            {/* Protected routes */}
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Layout><Profile /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/search" element={
+              <ProtectedRoute>
+                <Layout><Search /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/messages" element={
+              <ProtectedRoute>
+                <Layout><Messages /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/create-listing" element={
+              <ProtectedRoute>
+                <Layout><CreateListing /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/listing/:id" element={
+              <ProtectedRoute>
+                <Layout><ListingDetail /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/my-listings" element={
+              <ProtectedRoute>
+                <Layout><MyListings /></Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/favorites" element={
+              <ProtectedRoute>
+                <Layout><Favorites /></Layout>
+              </ProtectedRoute>
+            } />
           </Routes>
         </div>
       </AuthProvider>
