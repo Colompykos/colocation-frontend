@@ -1,10 +1,21 @@
+/* Profile.css */
 .profile-container {
   max-width: 600px;
   margin: 40px auto;
   padding: 40px;
   background: white;
-  border-radius: 24px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 16px; /* Consistent radius */
+  box-shadow: 0 10px 30px rgba(108, 99, 255, 0.1); /* Consistent shadow */
+}
+
+.profile-container h1 {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 2.2rem;
+  color: #2A265F; /* Secondary */
+  margin-bottom: 24px;
+  font-weight: 700;
+  line-height: 1.6; /* Clean line-height */
+  text-align: center;
 }
 
 .photo-upload {
@@ -21,8 +32,13 @@
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 12px;
-  border: 3px solid #ffd60a;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 3px solid #6C63FF; /* Primary */
+  box-shadow: 0 4px 8px rgba(108, 99, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth transition */
+}
+
+.profile-photo:hover {
+  transform: scale(1.05);
 }
 
 .form-group {
@@ -31,68 +47,91 @@
 }
 
 .form-group label {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   display: block;
   margin-bottom: 8px;
-  color: #333;
-  font-weight: 500;
+  color: #1A1A2E; /* Dark */
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.form-group h3 {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: #2A265F; /* Secondary */
+  font-size: 1.5rem;
+  margin-bottom: 16px;
+  font-weight: 700;
+  line-height: 1.6;
 }
 
 .form-input {
-  width: calc(100% - 32px); /* Ajustement de la largeur en tenant compte du padding */
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  width: 100%;
   padding: 12px 16px;
-  border: 1px solid #e1e1e1;
-  border-radius: 12px;
+  border: 1px solid #EFF0FF;
+  border-radius: 16px; /* Consistent radius */
   font-size: 15px;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: #F9F9FD; /* Light */
+  color: #1A1A2E; /* Dark */
+  line-height: 1.6;
+}
+
+.form-input:focus {
+  border-color: #6C63FF; /* Primary */
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+  outline: none;
 }
 
 select.form-input {
-  width: 100%; /* Pour les selects, on utilise 100% */
-  background-color: white;
+  width: 100%;
+  background-color: #F9F9FD; /* Light */
 }
 
 textarea.form-input {
-  width: calc(100% - 32px);
+  width: 100%;
   resize: vertical;
   min-height: 100px;
 }
 
 .upload-button {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   display: inline-block;
   padding: 8px 16px;
-  background: #ffd60a;
-  border-radius: 8px;
+  background: #6C63FF; /* Primary */
+  border-radius: 16px; /* Consistent radius */
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   border: none;
-  color: #000;
+  color: white;
   font-weight: 500;
   margin-top: 8px;
 }
 
 .upload-button:hover {
-  background: #ffe44d;
-  transform: translateY(-1px);
+  background: #2A265F; /* Secondary */
+  transform: translateY(-2px);
 }
 
 .submit-button {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   width: 100%;
   padding: 14px;
-  background: #ffd60a;
+  background: #6C63FF; /* Primary */
   border: none;
-  border-radius: 12px;
-  color: #000;
+  border-radius: 16px; /* Consistent radius */
+  color: white;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   margin-top: 20px;
 }
 
 .submit-button:hover {
-  background: #ffe44d;
-  transform: translateY(-1px);
+  background: #2A265F; /* Secondary */
+  transform: translateY(-2px);
 }
 
 .submit-button:disabled {
@@ -102,29 +141,33 @@ textarea.form-input {
 }
 
 .error-message {
-  background-color: #fff2f0;
-  border: 1px solid #ffccc7;
-  color: #ff4d4f;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background-color: #fff2f6;
+  border: 1px solid #FF6584; /* Accent */
+  color: #FF6584; /* Accent */
   padding: 12px;
-  border-radius: 12px;
+  border-radius: 16px; /* Consistent radius */
   margin-bottom: 20px;
   text-align: center;
+  line-height: 1.6;
 }
 
 .student-card-section {
   margin-top: 30px;
   padding: 20px;
-  background: #f8f9fa;
-  border-radius: 12px;
+  background: #F9F9FD; /* Light */
+  border-radius: 16px; /* Consistent radius */
 }
 
 .verification-status {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 16px; /* Consistent radius */
   margin-bottom: 15px;
+  line-height: 1.6;
 }
 
 .verification-status i {
@@ -132,18 +175,30 @@ textarea.form-input {
 }
 
 .verification-status.verified {
-  background: #e6f7e6;
-  color: #52c41a;
+  background: #f0f0ff;
+  color: #6C63FF; /* Primary */
+}
+
+.verification-status.verified i {
+  color: #6C63FF; /* Primary */
 }
 
 .verification-status.pending {
-  background: #fff7e6;
-  color: #fa8c16;
+  background: #f0f0ff;
+  color: #6C63FF; /* Primary */
+}
+
+.verification-status.pending i {
+  color: #6C63FF; /* Primary */
 }
 
 .verification-status.not-submitted {
-  background: #fff1f0;
-  color: #ff4d4f;
+  background: #fff2f6;
+  color: #FF6584; /* Accent */
+}
+
+.verification-status.not-submitted i {
+  color: #FF6584; /* Accent */
 }
 
 .student-card-preview {
@@ -152,8 +207,9 @@ textarea.form-input {
 
 .student-card-img {
   max-width: 100%;
-  border-radius: 8px;
-  border: 1px solid #e1e1e1;
+  border-radius: 16px; /* Consistent radius */
+  border: 1px solid #EFF0FF;
+  box-shadow: 0 4px 8px rgba(108, 99, 255, 0.1);
 }
 
 @media (max-width: 768px) {
@@ -163,10 +219,10 @@ textarea.form-input {
   }
 
   .form-input {
-    width: calc(100% - 32px);
+    width: 100%;
   }
 
   textarea.form-input {
-    width: calc(100% - 32px);
+    width: 100%;
   }
 }

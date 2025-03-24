@@ -184,9 +184,8 @@ const ListingDetail = () => {
               key={index}
               src={photo}
               alt={`Thumbnail ${index + 1}`}
-              className={`${styles.thumbnail} ${
-                currentPhotoIndex === index ? styles.activeThumbnail : ""
-              }`}
+              className={`${styles.thumbnail} ${currentPhotoIndex === index ? styles.activeThumbnail : ""
+                }`}
               onClick={() => setCurrentPhotoIndex(index)}
             />
           ))}
@@ -276,43 +275,23 @@ const ListingDetail = () => {
         </div>
         <div className={styles.contactSection}>
           <h3>Contact</h3>
-          <div className={styles.contactGrid}>
-            <div className={styles.contactInfo}>
-              <p>
-                <i className="fas fa-user"></i> {listing.contact.name}
-              </p>
-              <p>
-                <i className="fas fa-phone"></i> {listing.contact.phone}
-              </p>
-              <p>
-                <i className="fas fa-envelope"></i> {listing.contact.email}
-              </p>
-            </div>
-            <div className={styles.contactActions}>
-              {user ? (
-                user.uid !== listing.metadata.userId ? (
-                  <button
-                    className={styles.chatButton}
-                    onClick={() => navigate(`/messages?recipientId=${listing.metadata.userId}`)}
-                  >
-                    <i className="fas fa-comments"></i> Message
-                  </button>
-                ) : (
-                  <div className={styles.ownListingNotice}>
-                    <i className="fas fa-info-circle"></i> This is your listing
-                  </div>
-                )
-              ) : (
-                <button
-                  className={styles.chatButton}
-                  onClick={() => navigate(`/login?redirect=/listing/${id}`)}
-                >
-                  <i className="fas fa-sign-in-alt"></i> Login to contact
-                </button>
-              )}
-            </div>
+          <div className={styles.contactInfo}>
+            <p><i className="fas fa-user"></i> {listing.contact.name}</p>
+            <p><i className="fas fa-phone"></i> {listing.contact.phone}</p>
+            <p><i className="fas fa-envelope"></i> {listing.contact.email}</p>
           </div>
         </div>
+
+        {user && user.uid !== listing.metadata.userId && (
+          <div className={styles.floatingMessageButton}>
+            <button
+              className={styles.chatButton}
+              onClick={() => navigate(`/messages?recipientId=${listing.metadata.userId}`)}
+            >
+              <i className="fas fa-comments"></i> Message
+            </button>
+          </div>
+        )}
       </div>
 
       <div className={styles.reportSection}>

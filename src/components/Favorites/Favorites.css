@@ -1,7 +1,9 @@
+/* Favorites.css */
 .favorites-container {
   max-width: 1200px;
   margin: 40px auto;
   padding: 0 20px;
+  background: #F9F9FD; /* Light */
 }
 
 .favorites-header {
@@ -12,52 +14,65 @@
 }
 
 .favorites-header h1 {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   font-size: 28px;
-  color: #333;
+  color: #2A265F; /* Secondary */
   margin: 0;
+  font-weight: 700;
+  line-height: 1.6; /* Clean line-height */
 }
 
 .no-favorites {
   text-align: center;
   padding: 60px 20px;
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 16px; /* Consistent radius */
+  box-shadow: 0 10px 30px rgba(108, 99, 255, 0.1); /* Consistent shadow */
+}
+
+.no-favorites p {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: #8A8AA3; /* Gray */
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+  line-height: 1.6;
 }
 
 .listings-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
+  gap: 30px; /* Slightly increased for consistency with other pages */
   margin-top: 20px;
 }
 
 .listing-card {
   background: white;
-  border-radius: 16px;
+  border-radius: 16px; /* Consistent radius */
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  box-shadow: 0 10px 30px rgba(108, 99, 255, 0.1); /* Consistent shadow */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth transition */
   cursor: pointer;
 }
 
 .listing-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(108, 99, 255, 0.15);
 }
 
 .search-button {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   padding: 12px 24px;
-  background: #ffd60a;
+  background: #6C63FF; /* Primary */
   border: none;
-  border-radius: 12px;
-  color: #000;
-  font-weight: 500;
+  border-radius: 16px; /* Consistent radius */
+  color: white;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   margin-top: 20px;
 }
 
 .search-button:hover {
-  background: #ffe44d;
-  transform: translateY(-1px);
+  background: #2A265F; /* Secondary */
+  transform: translateY(-2px);
 }

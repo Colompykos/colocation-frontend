@@ -46,10 +46,10 @@ const Home = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && handleSearch(e)}
           />
+        </div>
           <button onClick={handleSearch} className="search-button">
             Rechercher
           </button>
-        </div>
 
         <div className="features-grid">
           <div className="feature-card">
