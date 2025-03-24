@@ -23,7 +23,11 @@ const Home = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    navigate(`/search?location=${encodeURIComponent(searchQuery)}`);
+    if (searchQuery.trim()) {
+      navigate(`/search?location=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/search');
+    }
   };
 
   return (
@@ -42,7 +46,7 @@ const Home = () => {
             className="search-input"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSearch(e)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch(e)}
           />
         </div>
           <button onClick={handleSearch} className="search-button">

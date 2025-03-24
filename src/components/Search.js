@@ -2,17 +2,22 @@ import React, { useState, useEffect } from "react";
 import { db } from "../config/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import FavoriteButton from './Favorites/FavoriteButton';
-import { GoogleMap, useLoadScript, Marker, InfoWindow } from '@react-google-maps/api';
+import FavoriteButton from "./Favorites/FavoriteButton";
+import {
+  GoogleMap,
+  useLoadScript,
+  Marker,
+  InfoWindow,
+} from "@react-google-maps/api";
 import "./Search.css";
 
-const libraries = ['places'];
+const libraries = ["places"];
 
 const mapContainerStyle = {
-  width: '100%',
-  height: '700px',
-  borderRadius: '16px',
-  overflow: 'hidden'
+  width: "100%",
+  height: "700px",
+  borderRadius: "16px",
+  overflow: "hidden",
 };
 
 const Search = () => {
@@ -25,7 +30,6 @@ const Search = () => {
   const [infoWindowClosing, setInfoWindowClosing] = useState(false);
 
   const handleInfoWindowMouseLeave = () => {
-
     setInfoWindowClosing(true);
 
     setTimeout(() => {
@@ -34,18 +38,19 @@ const Search = () => {
     }, 300);
   };
 
-
   const [viewMode, setViewMode] = useState("grid");
-  const [mapCenter, setMapCenter] = useState({ lat: 43.7102, lng: 7.2620 });
+  const [mapCenter, setMapCenter] = useState({ lat: 43.7102, lng: 7.262 });
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-    libraries
+    libraries,
   });
 
   const [filters, setFilters] = useState({
     location: location || "",
     maxBudget: "",
+    minPrice: "",
+    maxPrice: "",
     propertyType: "",
     roommates: "",
     furnished: false,
@@ -68,47 +73,63 @@ const Search = () => {
 
   useEffect(() => {
     const initialize = async () => {
-      await fetchListings();
-      if (location) {
-        setFilters((prev) => ({
-          ...prev,
-          location: location,
-        }));
+      console.log("Initializing search component");
+      const listingsData = await fetchListings();
+      
+      if (listingsData.length > 0) {
+        console.log("Listings loaded, applying filters");
+        applyFilters(listingsData);
       }
     };
+    
     initialize();
+  }, []); 
+
+  useEffect(() => {
+    if (location) {
+      console.log("URL location parameter found:", location);
+      setFilters(prev => ({
+        ...prev,
+        location: location
+      }));
+    }
   }, [location]);
 
   useEffect(() => {
-    fetchListings();
-  }, []);
-
+    if (listings.length > 0) {
+      applyFilters();
+    }
+  }, [filters]);
 
   useEffect(() => {
     if (filteredListings.length > 0) {
-
       const listingWithCoords = filteredListings.find(
-        listing => listing.location && listing.location.coordinates &&
-          listing.location.coordinates.lat && listing.location.coordinates.lng
+        (listing) =>
+          listing.location &&
+          listing.location.coordinates &&
+          listing.location.coordinates.lat &&
+          listing.location.coordinates.lng
       );
 
       if (listingWithCoords && listingWithCoords.location.coordinates) {
         setMapCenter({
           lat: listingWithCoords.location.coordinates.lat,
-          lng: listingWithCoords.location.coordinates.lng
+          lng: listingWithCoords.location.coordinates.lng,
         });
       }
     }
   }, [filteredListings]);
 
+
   const geocodeAddress = async (address) => {
-    // Skip geocoding if address is empty
-    if (!address || address.trim() === '') {
+    if (!address || address.trim() === "") {
       console.warn("Empty address provided for geocoding");
       return null;
     }
 
-    const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`;
+    const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+      address
+    )}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`;
 
     try {
       const response = await fetch(geocodeUrl);
@@ -118,7 +139,14 @@ const Search = () => {
         const { lat, lng } = data.results[0].geometry.location;
         return { lat, lng };
       } else {
-        console.error("Geocoding failed for address:", address, "Status:", data.status, "Error:", data.error_message || "Unknown error");
+        console.error(
+          "Geocoding failed for address:",
+          address,
+          "Status:",
+          data.status,
+          "Error:",
+          data.error_message || "Unknown error"
+        );
         return null;
       }
     } catch (error) {
@@ -133,48 +161,53 @@ const Search = () => {
       const listingsData = await Promise.all(
         querySnapshot.docs.map(async (doc, index) => {
           const data = doc.data();
-
-          // Check if coordinates are missing
-          if (!data.location?.coordinates ||
+  
+          if (
+            !data.location?.coordinates ||
             !data.location.coordinates.lat ||
-            !data.location.coordinates.lng) {
-
-            // Add delay to avoid hitting rate limits (200ms between requests)
-            await new Promise(resolve => setTimeout(resolve, index * 200));
-
-            const address = `${data.location?.street || ''}, ${data.location?.city || ''}, ${data.location?.country || ''}`;
-
+            !data.location.coordinates.lng
+          ) {
+            await new Promise((resolve) => setTimeout(resolve, index * 200));
+  
+            const address = `${data.location?.street || ""}, ${
+              data.location?.city || ""
+            }, ${data.location?.country || ""}`;
+  
             try {
-              // First try with full address
               let coordinates = await geocodeAddress(address);
-
-              // If that fails, try with just city and country
+  
               if (!coordinates && data.location?.city) {
-                const simplifiedAddress = `${data.location.city}, ${data.location?.country || ''}`;
+                const simplifiedAddress = `${data.location.city}, ${
+                  data.location?.country || ""
+                }`;
                 coordinates = await geocodeAddress(simplifiedAddress);
               }
-
-              // Use coordinates or default to Paris
+  
+              // Use coordinates or default to Nice
               data.location = data.location || {};
-              data.location.coordinates = coordinates || { lat: 48.8566, lng: 2.3522 };
+              data.location.coordinates = coordinates || {
+                lat: 43.7102,
+                lng: 7.2620,
+              };
             } catch (error) {
               console.error("Error during geocoding in fetchListings:", error);
               data.location = data.location || {};
               data.location.coordinates = { lat: 48.8566, lng: 2.3522 };
             }
           }
-
+  
           return {
             id: doc.id,
             ...data,
           };
         })
       );
-
+  
       setListings(listingsData);
-      setFilteredListings(listingsData);
+      return listingsData; 
     } catch (error) {
       console.error("Error fetching listings:", error);
+      return [];
     }
   };
 
@@ -204,62 +237,87 @@ const Search = () => {
     }
   };
 
-  useEffect(() => {
-    applyFilters();
-  }, [filters]);
-
-  const applyFilters = () => {
-    let filtered = [...listings];
-
-    // Filtre par localisation
+  const applyFilters = (listingsToFilter = listings) => {
+    console.log('Applying filters - Listings count:', listingsToFilter.length);
+    console.log('Current location filter:', filters.location);
+    
+    let filtered = [...listingsToFilter];
+  
     if (filters.location) {
       filtered = filtered.filter((listing) => {
-        const cityMatch = listing.location?.city
-          ?.toLowerCase()
-          ?.includes(filters.location.toLowerCase()) || false;
-        const countryMatch = listing.location?.country
-          ?.toLowerCase()
-          ?.includes(filters.location.toLowerCase()) || false;
+        const cityMatch =
+          listing.location?.city
+            ?.toLowerCase()
+            ?.includes(filters.location.toLowerCase()) || false;
+        const countryMatch =
+          listing.location?.country
+            ?.toLowerCase()
+            ?.includes(filters.location.toLowerCase()) || false;
         return cityMatch || countryMatch;
       });
+      
+      console.log('After location filtering - Results:', filtered.length);
     }
-
-    // Filtre par budget
+  
+    if (filters.minPrice) {
+      filtered = filtered.filter(
+        (listing) => listing.details?.rent >= parseInt(filters.minPrice)
+      );
+    }
+  
+    if (filters.maxPrice) {
+      filtered = filtered.filter(
+        (listing) => listing.details?.rent <= parseInt(filters.maxPrice)
+      );
+    }
+  
     if (filters.maxBudget) {
       filtered = filtered.filter(
         (listing) => listing.details?.rent <= parseInt(filters.maxBudget)
       );
     }
-
+  
+    if (filters.propertyType) {
+      filtered = filtered.filter(
+        (listing) => listing.details?.propertyType === filters.propertyType
+      );
+    }
+  
     // Filtre par date de disponibilité
     if (filters.availableFrom) {
       filtered = filtered.filter(
         (listing) => listing.details?.availableDate >= filters.availableFrom
       );
     }
-
+  
     // Filtre par amenités
     Object.entries(filters.amenities).forEach(([amenity, isRequired]) => {
       if (isRequired) {
         filtered = filtered.filter((listing) => listing.services?.[amenity]);
       }
     });
-
+  
     // Tri
     switch (filters.sortBy) {
       case "priceAsc":
-        filtered.sort((a, b) => (a.details?.rent || 0) - (b.details?.rent || 0));
+        filtered.sort(
+          (a, b) => (a.details?.rent || 0) - (b.details?.rent || 0)
+        );
         break;
       case "priceDesc":
-        filtered.sort((a, b) => (b.details?.rent || 0) - (a.details?.rent || 0));
+        filtered.sort(
+          (a, b) => (b.details?.rent || 0) - (a.details?.rent || 0)
+        );
         break;
       case "newest":
-        filtered.sort((a, b) => (b.metadata?.createdAt || 0) - (a.metadata?.createdAt || 0));
+        filtered.sort(
+          (a, b) => (b.metadata?.createdAt || 0) - (a.metadata?.createdAt || 0)
+        );
         break;
       default:
         break;
     }
-
+  
     setFilteredListings(filtered);
   };
 
@@ -286,7 +344,8 @@ const Search = () => {
     });
   };
 
-  if (loadError) return <div className="map-error">Error loading Google Maps</div>;
+  if (loadError)
+    return <div className="map-error">Error loading Google Maps</div>;
 
   return (
     <div className="search-container">
@@ -315,10 +374,14 @@ const Search = () => {
       <div className="search-content">
         <aside className="filters-sidebar">
           <div className="filters-section">
-            <h3><i className="fas fa-filter"></i> Filters</h3>
+            <h3>
+              <i className="fas fa-filter"></i> Filters
+            </h3>
 
             <div className="filter-group">
-              <label><i className="fas fa-map-marker-alt"></i> Location</label>
+              <label>
+                <i className="fas fa-map-marker-alt"></i> Location
+              </label>
               <input
                 type="text"
                 name="location"
@@ -330,11 +393,15 @@ const Search = () => {
             </div>
 
             <div className="filter-group">
-              <label><i className="fas fa-euro-sign"></i> Price Range</label>
+              <label>
+                <i className="fas fa-euro-sign"></i> Price Range
+              </label>
               <div className="price-inputs">
                 <input
                   type="number"
                   name="minPrice"
+                  value={filters.minPrice || ""}
+                  onChange={handleFilterChange}
                   placeholder="Min"
                   className="filter-input"
                 />
@@ -342,6 +409,8 @@ const Search = () => {
                 <input
                   type="number"
                   name="maxPrice"
+                  value={filters.maxPrice || ""}
+                  onChange={handleFilterChange}
                   placeholder="Max"
                   className="filter-input"
                 />
@@ -349,7 +418,9 @@ const Search = () => {
             </div>
 
             <div className="filter-group">
-              <label><i className="fas fa-calendar-alt"></i> Available From</label>
+              <label>
+                <i className="fas fa-calendar-alt"></i> Available From
+              </label>
               <input
                 type="date"
                 name="availableFrom"
@@ -360,7 +431,9 @@ const Search = () => {
             </div>
 
             <div className="filter-group">
-              <label><i className="fas fa-home"></i> Property Type</label>
+              <label>
+                <i className="fas fa-home"></i> Property Type
+              </label>
               <select
                 name="propertyType"
                 value={filters.propertyType}
@@ -375,7 +448,9 @@ const Search = () => {
             </div>
 
             <div className="amenities-section">
-              <h4><i className="fas fa-concierge-bell"></i> Amenities</h4>
+              <h4>
+                <i className="fas fa-concierge-bell"></i> Amenities
+              </h4>
               <div className="amenities-grid">
                 {Object.entries(filters.amenities).map(([key, value]) => (
                   <label key={key} className="amenity-checkbox">
@@ -436,7 +511,9 @@ const Search = () => {
                 >
                   <div className="listing-image">
                     <img
-                      src={listing.photos?.[0] || "/Images/default-property.jpg"}
+                      src={
+                        listing.photos?.[0] || "/Images/default-property.jpg"
+                      }
                       alt={listing.details?.title || "Property"}
                       className="listing-photo"
                     />
@@ -449,7 +526,8 @@ const Search = () => {
                     <h3>{listing.details?.title || "No title"}</h3>
                     <div className="listing-location">
                       <i className="fas fa-map-marker-alt"></i>
-                      {listing.location?.city || "Unknown city"}, {listing.location?.country || "Unknown country"}
+                      {listing.location?.city || "Unknown city"},{" "}
+                      {listing.location?.country || "Unknown country"}
                     </div>
                     <div className="listing-details">
                       <span>
@@ -468,25 +546,36 @@ const Search = () => {
                     <div className="listing-services">
                       {listing.services?.wifi && (
                         <span className="service-tag">
-                          <i className={`fas fa-${getAmenityIcon("wifi")}`}></i> Wifi
+                          <i className={`fas fa-${getAmenityIcon("wifi")}`}></i>{" "}
+                          Wifi
                         </span>
                       )}
                       {listing.services?.washingMachine && (
                         <span className="service-tag">
-                          <i className={`fas fa-${getAmenityIcon("washingMachine")}`}></i> Washer
+                          <i
+                            className={`fas fa-${getAmenityIcon(
+                              "washingMachine"
+                            )}`}
+                          ></i>{" "}
+                          Washer
                         </span>
                       )}
                       {listing.services?.elevator && (
                         <span className="service-tag">
-                          <i className={`fas fa-${getAmenityIcon("elevator")}`}></i> Elevator
+                          <i
+                            className={`fas fa-${getAmenityIcon("elevator")}`}
+                          ></i>{" "}
+                          Elevator
                         </span>
                       )}
                     </div>
                     <div className="listing-available">
                       Available from:{" "}
-                      {listing.details?.availableDate ?
-                        new Date(listing.details.availableDate).toLocaleDateString() :
-                        "Unknown date"}
+                      {listing.details?.availableDate
+                        ? new Date(
+                            listing.details.availableDate
+                          ).toLocaleDateString()
+                        : "Unknown date"}
                     </div>
 
                     <div className="listing-author">
@@ -508,9 +597,11 @@ const Search = () => {
                           {listing.contact?.name || "Unknown"}
                         </span>
                         <span className="post-date">
-                          {listing.metadata?.createdAt?.toDate ?
-                            new Date(listing.metadata.createdAt.toDate()).toLocaleDateString() :
-                            "Unknown date"}
+                          {listing.metadata?.createdAt?.toDate
+                            ? new Date(
+                                listing.metadata.createdAt.toDate()
+                              ).toLocaleDateString()
+                            : "Unknown date"}
                         </span>
                       </div>
                     </div>
@@ -540,22 +631,33 @@ const Search = () => {
                     <InfoWindow
                       position={{
                         lat: selectedListing.location.coordinates.lat,
-                        lng: selectedListing.location.coordinates.lng
+                        lng: selectedListing.location.coordinates.lng,
                       }}
                       onCloseClick={() => setSelectedListing(null)}
                     >
                       <div
-                        className={`map-info-window ${infoWindowClosing ? 'fade-out-animation' : ''}`}
+                        className={`map-info-window ${
+                          infoWindowClosing ? "fade-out-animation" : ""
+                        }`}
                         onMouseLeave={handleInfoWindowMouseLeave}
                       >
                         <img
-                          src={selectedListing.photos?.[0] || "/Images/default-property.jpg"}
+                          src={
+                            selectedListing.photos?.[0] ||
+                            "/Images/default-property.jpg"
+                          }
                           alt={selectedListing.details?.title || "Property"}
                           className="info-window-image"
                         />
                         <h4>{selectedListing.details?.title || "No title"}</h4>
-                        <p className="info-price">€{selectedListing.details?.rent || 0}/month</p>
-                        <p>{selectedListing.location?.city || "Unknown city"}, {selectedListing.location?.country || "Unknown country"}</p>
+                        <p className="info-price">
+                          €{selectedListing.details?.rent || 0}/month
+                        </p>
+                        <p>
+                          {selectedListing.location?.city || "Unknown city"},{" "}
+                          {selectedListing.location?.country ||
+                            "Unknown country"}
+                        </p>
                         <button
                           className="view-listing-button"
                           onClick={(e) => {
