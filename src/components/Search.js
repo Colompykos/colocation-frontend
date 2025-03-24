@@ -25,24 +25,24 @@ const Search = () => {
   const [infoWindowClosing, setInfoWindowClosing] = useState(false);
 
   const handleInfoWindowMouseLeave = () => {
-    
+
     setInfoWindowClosing(true);
-    
+
     setTimeout(() => {
       setSelectedListing(null);
       setInfoWindowClosing(false);
     }, 300);
   };
-  
+
 
   const [viewMode, setViewMode] = useState("grid");
-  const [mapCenter, setMapCenter] = useState({ lat: 43.7102, lng: 7.2620 });  
+  const [mapCenter, setMapCenter] = useState({ lat: 43.7102, lng: 7.2620 });
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries
   });
-  
+
   const [filters, setFilters] = useState({
     location: location || "",
     maxBudget: "",
@@ -88,8 +88,8 @@ const Search = () => {
     if (filteredListings.length > 0) {
 
       const listingWithCoords = filteredListings.find(
-        listing => listing.location && listing.location.coordinates && 
-        listing.location.coordinates.lat && listing.location.coordinates.lng
+        listing => listing.location && listing.location.coordinates &&
+          listing.location.coordinates.lat && listing.location.coordinates.lng
       );
 
       if (listingWithCoords && listingWithCoords.location.coordinates) {
@@ -107,13 +107,13 @@ const Search = () => {
       console.warn("Empty address provided for geocoding");
       return null;
     }
-    
+
     const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`;
-    
+
     try {
       const response = await fetch(geocodeUrl);
       const data = await response.json();
-      
+
       if (data.status === "OK" && data.results && data.results.length > 0) {
         const { lat, lng } = data.results[0].geometry.location;
         return { lat, lng };
@@ -126,51 +126,51 @@ const Search = () => {
       return null;
     }
   };
-  
+
   const fetchListings = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "listings"));
       const listingsData = await Promise.all(
         querySnapshot.docs.map(async (doc, index) => {
           const data = doc.data();
-  
+
           // Check if coordinates are missing
-          if (!data.location?.coordinates || 
-              !data.location.coordinates.lat || 
-              !data.location.coordinates.lng) {
-            
+          if (!data.location?.coordinates ||
+            !data.location.coordinates.lat ||
+            !data.location.coordinates.lng) {
+
             // Add delay to avoid hitting rate limits (200ms between requests)
             await new Promise(resolve => setTimeout(resolve, index * 200));
-            
+
             const address = `${data.location?.street || ''}, ${data.location?.city || ''}, ${data.location?.country || ''}`;
-            
+
             try {
               // First try with full address
               let coordinates = await geocodeAddress(address);
-              
+
               // If that fails, try with just city and country
               if (!coordinates && data.location?.city) {
                 const simplifiedAddress = `${data.location.city}, ${data.location?.country || ''}`;
                 coordinates = await geocodeAddress(simplifiedAddress);
               }
-              
+
               // Use coordinates or default to Paris
               data.location = data.location || {};
               data.location.coordinates = coordinates || { lat: 48.8566, lng: 2.3522 };
             } catch (error) {
               console.error("Error during geocoding in fetchListings:", error);
               data.location = data.location || {};
-              data.location.coordinates = { lat: 48.8566, lng: 2.3522 }; 
+              data.location.coordinates = { lat: 48.8566, lng: 2.3522 };
             }
           }
-  
+
           return {
             id: doc.id,
             ...data,
           };
         })
       );
-  
+
       setListings(listingsData);
       setFilteredListings(listingsData);
     } catch (error) {
@@ -272,7 +272,7 @@ const Search = () => {
       ) {
         return null;
       }
-  
+
       return (
         <Marker
           key={listing.id}
@@ -315,10 +315,10 @@ const Search = () => {
       <div className="search-content">
         <aside className="filters-sidebar">
           <div className="filters-section">
-            <h3>Filters</h3>
+            <h3><i className="fas fa-filter"></i> Filters</h3>
 
             <div className="filter-group">
-              <label>Location</label>
+              <label><i className="fas fa-map-marker-alt"></i> Location</label>
               <input
                 type="text"
                 name="location"
@@ -330,7 +330,7 @@ const Search = () => {
             </div>
 
             <div className="filter-group">
-              <label>Price Range</label>
+              <label><i className="fas fa-euro-sign"></i> Price Range</label>
               <div className="price-inputs">
                 <input
                   type="number"
@@ -349,7 +349,7 @@ const Search = () => {
             </div>
 
             <div className="filter-group">
-              <label>Available From</label>
+              <label><i className="fas fa-calendar-alt"></i> Available From</label>
               <input
                 type="date"
                 name="availableFrom"
@@ -360,7 +360,7 @@ const Search = () => {
             </div>
 
             <div className="filter-group">
-              <label>Property Type</label>
+              <label><i className="fas fa-home"></i> Property Type</label>
               <select
                 name="propertyType"
                 value={filters.propertyType}
@@ -375,7 +375,7 @@ const Search = () => {
             </div>
 
             <div className="amenities-section">
-              <h4>Amenities</h4>
+              <h4><i className="fas fa-concierge-bell"></i> Amenities</h4>
               <div className="amenities-grid">
                 {Object.entries(filters.amenities).map(([key, value]) => (
                   <label key={key} className="amenity-checkbox">
@@ -400,6 +400,7 @@ const Search = () => {
                   checked={filters.instant}
                   onChange={handleFilterChange}
                 />
+                <i className="fas fa-bolt"></i>
                 <span className="toggle-label">Instant Booking</span>
               </label>
             </div>
@@ -466,19 +467,25 @@ const Search = () => {
                     </div>
                     <div className="listing-services">
                       {listing.services?.wifi && (
-                        <span className="service-tag">Wifi</span>
+                        <span className="service-tag">
+                          <i className={`fas fa-${getAmenityIcon("wifi")}`}></i> Wifi
+                        </span>
                       )}
                       {listing.services?.washingMachine && (
-                        <span className="service-tag">Washer</span>
+                        <span className="service-tag">
+                          <i className={`fas fa-${getAmenityIcon("washingMachine")}`}></i> Washer
+                        </span>
                       )}
-                      {listing.details?.furnished && (
-                        <span className="service-tag">Furnished</span>
+                      {listing.services?.elevator && (
+                        <span className="service-tag">
+                          <i className={`fas fa-${getAmenityIcon("elevator")}`}></i> Elevator
+                        </span>
                       )}
                     </div>
                     <div className="listing-available">
                       Available from:{" "}
-                      {listing.details?.availableDate ? 
-                        new Date(listing.details.availableDate).toLocaleDateString() : 
+                      {listing.details?.availableDate ?
+                        new Date(listing.details.availableDate).toLocaleDateString() :
                         "Unknown date"}
                     </div>
 
@@ -501,8 +508,8 @@ const Search = () => {
                           {listing.contact?.name || "Unknown"}
                         </span>
                         <span className="post-date">
-                          {listing.metadata?.createdAt?.toDate ? 
-                            new Date(listing.metadata.createdAt.toDate()).toLocaleDateString() : 
+                          {listing.metadata?.createdAt?.toDate ?
+                            new Date(listing.metadata.createdAt.toDate()).toLocaleDateString() :
                             "Unknown date"}
                         </span>
                       </div>
@@ -528,7 +535,7 @@ const Search = () => {
                   }}
                 >
                   {renderMarkers()}
-                  
+
                   {selectedListing && selectedListing.location?.coordinates && (
                     <InfoWindow
                       position={{
@@ -537,22 +544,22 @@ const Search = () => {
                       }}
                       onCloseClick={() => setSelectedListing(null)}
                     >
-                      <div 
+                      <div
                         className={`map-info-window ${infoWindowClosing ? 'fade-out-animation' : ''}`}
                         onMouseLeave={handleInfoWindowMouseLeave}
                       >
-                        <img 
-                          src={selectedListing.photos?.[0] || "/Images/default-property.jpg"} 
+                        <img
+                          src={selectedListing.photos?.[0] || "/Images/default-property.jpg"}
                           alt={selectedListing.details?.title || "Property"}
                           className="info-window-image"
                         />
                         <h4>{selectedListing.details?.title || "No title"}</h4>
                         <p className="info-price">€{selectedListing.details?.rent || 0}/month</p>
                         <p>{selectedListing.location?.city || "Unknown city"}, {selectedListing.location?.country || "Unknown country"}</p>
-                        <button 
+                        <button
                           className="view-listing-button"
                           onClick={(e) => {
-                            e.stopPropagation(); 
+                            e.stopPropagation();
                             navigate(`/listing/${selectedListing.id}`);
                           }}
                         >
@@ -574,9 +581,9 @@ const Search = () => {
 const getAmenityIcon = (amenity) => {
   const icons = {
     wifi: "wifi",
-    washingMachine: "washer",
+    washingMachine: "soap",
     parking: "parking",
-    elevator: "elevator",
+    elevator: "door-open",
     tv: "tv",
     bikeParking: "bicycle",
     kitchenware: "utensils",

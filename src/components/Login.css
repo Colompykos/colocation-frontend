@@ -1,9 +1,10 @@
+/* Login.css */
 .login-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f5f5f5;
+  background-color: #F9F9FD; /* Light */
   padding: 20px;
 }
 
@@ -17,21 +18,18 @@
   max-width: 1200px;
   min-height: 600px;
   background: white;
-  border-radius: 24px;
+  border-radius: 16px; /* Consistent radius */
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(108, 99, 255, 0.1); /* Consistent shadow */
 }
 
 .form-side {
   flex: 1;
   padding: 40px;
-  background: linear-gradient(135deg, #fff 0%, #f8f8f8 100%);
+  background: white;
 }
 
 .brand {
-  font-size: 24px;
-  font-weight: 600;
-  color: #333;
   margin-bottom: 25px;
 }
 
@@ -41,15 +39,19 @@
 }
 
 h1 {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   font-size: 32px;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #2A265F; /* Secondary */
   margin-bottom: 8px;
+  line-height: 1.6; /* Clean line-height */
 }
 
 .subtitle {
-  color: #666;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: #8A8AA3; /* Gray */
   margin-bottom: 40px;
+  line-height: 1.6;
 }
 
 .form-group {
@@ -57,49 +59,57 @@ h1 {
 }
 
 label {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   display: block;
   margin-bottom: 8px;
-  color: #333;
+  color: #1A1A2E; /* Dark */
   font-size: 14px;
+  font-weight: 500;
+  line-height: 1.6;
 }
 
 .form-input {
-  width: 92%;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  width: 100%;
   padding: 12px 16px;
-  border: 1px solid #e1e1e1;
-  border-radius: 12px;
+  border: 1px solid #EFF0FF;
+  border-radius: 16px; /* Consistent radius */
   font-size: 15px;
-  transition: all 0.3s ease;
-  background: white;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth transition */
+  background: #F9F9FD; /* Light */
+  color: #1A1A2E; /* Dark */
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #007aff;
-  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+  border-color: #6C63FF; /* Primary */
+  box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.2);
 }
 
 .submit-button {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   width: 100%;
   padding: 14px;
-  background: #ffd60a;
+  background: #6C63FF; /* Primary */
   border: none;
-  border-radius: 12px;
-  color: #000;
+  border-radius: 16px; /* Consistent radius */
+  color: white;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   margin-bottom: 24px;
 }
 
 .submit-button:hover {
-  background: #ffe44d;
+  background: #2A265F; /* Secondary */
+  transform: translateY(-2px);
 }
 
 .submit-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+  transform: none;
 }
 
 .social-login {
@@ -109,37 +119,45 @@ label {
 }
 
 .social-button {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   padding: 12px;
-  border: 1px solid #e1e1e1;
-  border-radius: 12px;
+  border: 1px solid #EFF0FF;
+  border-radius: 16px; /* Consistent radius */
   background: white;
-  color: #333;
+  color: #1A1A2E; /* Dark */
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .social-button:hover {
-  background: #f5f5f5;
+  background: #F9F9FD; /* Light */
+  border-color: #6C63FF; /* Primary */
 }
 
 .login-footer {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #666;
+  color: #8A8AA3; /* Gray */
   font-size: 14px;
 }
 
 .login-footer a {
-  color: #333;
+  color: #6C63FF; /* Primary */
   text-decoration: none;
   font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.login-footer a:hover {
+  color: #2A265F; /* Secondary */
 }
 
 .image-side {
@@ -162,8 +180,8 @@ label {
   bottom: 0;
   background: linear-gradient(
     135deg,
-    rgba(0, 0, 0, 0.2) 0%,
-    rgba(0, 0, 0, 0) 100%
+    rgba(108, 99, 255, 0.2) 0%, /* Primary with opacity */
+    rgba(108, 99, 255, 0) 100%
   );
 }
 
@@ -175,25 +193,16 @@ label {
 }
 
 .error-message {
-  background-color: #fff2f0;
-  border: 1px solid #ffccc7;
-  color: #ff4d4f;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background-color: #fff2f6;
+  border: 1px solid #FF6584; /* Accent */
+  color: #FF6584; /* Accent */
   padding: 12px;
-  border-radius: 12px;
+  border-radius: 16px; /* Consistent radius */
   margin-bottom: 20px;
   font-size: 14px;
   text-align: center;
-}
-
-.success-message {
-  background-color: #f6ffed;
-  border: 1px solid #b7eb8f;
-  color: #52c41a;
-  padding: 12px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  font-size: 14px;
-  text-align: center;
+  line-height: 1.6;
 }
 
 .name-fields {
@@ -206,7 +215,7 @@ label {
 }
 
 .name-fields .form-input {
-  width: 83%;
+  width: 100%;
 }
 
 .forgot-password {
@@ -215,13 +224,15 @@ label {
 }
 
 .forgot-password a {
-  color: #666;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: #6C63FF; /* Primary */
   text-decoration: none;
   font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .forgot-password a:hover {
-  color: #333;
+  color: #2A265F; /* Secondary */
   text-decoration: underline;
 }
 

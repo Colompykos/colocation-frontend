@@ -2,29 +2,33 @@
   max-width: 1200px;
   margin: 40px auto;
   padding: 0 20px;
+  font-family: 'Arial', sans-serif;
 }
 
 .gallerySection {
   margin-bottom: 40px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
 }
 
 .mainPhotoContainer {
   position: relative;
   width: 100%;
   height: 500px;
-  border-radius: 16px;
   overflow: hidden;
-}
-
-.mainPhotoContainer :global(.favorite-button) {
-  top: 20px;
-  right: 20px;
 }
 
 .mainPhoto {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.mainPhoto:hover {
+  transform: scale(1.02);
 }
 
 .photoNav {
@@ -39,357 +43,180 @@
 }
 
 .navButton {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(52, 58, 64, 0.8); /* Gris foncé de la navbar */
+  color: #fff;
   border: none;
   border-radius: 50%;
   width: 40px;
   height: 40px;
   font-size: 24px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease;
 }
 
 .navButton:hover {
-  background: white;
+  background: #343a40;
 }
 
 .thumbnailGrid {
   display: flex;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: 15px;
+  padding: 10px;
   overflow-x: auto;
-  padding-bottom: 10px;
 }
 
 .thumbnail {
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
   object-fit: cover;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease;
+}
+
+.thumbnail:hover {
+  transform: scale(1.05);
 }
 
 .activeThumbnail {
-  border: 3px solid #ffd60a;
+  border: 3px solid #007bff; /* Bleu pour cohérence */
 }
 
 .contentSection {
-  padding: 20px;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .headerSection {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
 .title {
-  font-size: 28px;
-  color: #333;
+  font-size: 2rem;
+  color: #343a40; /* Gris foncé pour le titre */
   margin: 0;
 }
 
 .priceTag {
-  font-size: 24px;
-  font-weight: bold;
-  color: #ffd60a;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #007bff; /* Bleu pour le prix */
 }
 
-.locationSection {
-  margin-bottom: 30px;
+.locationSection h3,
+.propertySection h3,
+.amenitiesSection h3,
+.descriptionSection h3,
+.contactSection h3 {
+  color: #343a40;
+  margin-bottom: 15px;
+  font-size: 1.25rem;
 }
 
-.locationSection h3 {
-  color: #333;
-  margin-bottom: 10px;
-}
-
-.locationSection p {
-  color: #666;
-  margin: 5px 0;
-}
-
-.featuresGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 40px;
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 12px;
-}
-
-.featureItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.featureItem i {
-  color: #ffd60a;
-  font-size: 20px;
-}
-
-.propertySection {
-  margin-bottom: 40px;
-}
-
-.detailsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-}
-
-.detailItem {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  background: #f8f9fa;
-  border-radius: 8px;
-}
-
-.label {
-  color: #666;
-}
-
-.amenitiesSection {
-  margin-bottom: 40px;
-}
-
+.featuresGrid,
+.detailsGrid,
 .amenitiesGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 15px;
-  margin-top: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
 }
 
+.featureItem,
 .amenityItem {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  color: #333;
 }
 
+.featureItem i,
 .amenityItem i {
-  color: #ffd60a;
-}
-
-.descriptionSection {
-  margin: 40px 0;
-  line-height: 1.6;
-}
-
-.descriptionSection p {
-  color: #666;
+  color: #007bff; /* Bleu pour les icônes */
 }
 
 .contactSection {
   background: #f8f9fa;
   padding: 20px;
-  border-radius: 12px;
-  margin-top: 40px;
-}
-
-.contactGrid {
-  display: grid;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.contactGrid p {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #666;
-}
-
-.contactGrid i {
-  color: #ffd60a;
-}
-
-.loadingState,
-.errorState {
-  text-align: center;
-  padding: 40px;
-  font-size: 18px;
-  color: #666;
-}
-
-.reportSection {
-  margin: 1rem 0;
-  display: flex;
-  justify-content: flex-end;
+  border-radius: 10px;
+  margin-top: 30px;
 }
 
 .reportButton {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
   background: #ef4444;
-  color: white;
+  color: #fff;
   border: none;
+  padding: 10px 20px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 0.875rem;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease;
 }
 
 .reportButton:hover {
   background: #dc2626;
-  transform: translateY(-1px);
 }
 
-.reportButton i {
-  font-size: 1rem;
-}
-
-@media (max-width: 768px) {
-  .mainPhotoContainer {
-    height: 300px;
-  }
-
-  .headerSection {
-    flex-direction: column;
-    gap: 10px;
-    text-align: center;
-  }
-
-  .detailsGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .contentSection {
-    padding: 15px;
-  }
-}
-
+/* Modal */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modalContent {
-  position: relative;
-  max-width: 90vw;
-  max-height: 90vh;
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .fullImage {
-  max-width: 80vw;
-  max-height: 80vh;
-  border-radius: 8px;
-  object-fit: contain;
+  max-width: 85vw;
+  max-height: 85vh;
+  border-radius: 12px;
 }
 
 .closeButton {
   position: absolute;
-  top: 20px;
-  right: 30px;
-  font-size: 30px;
-  color: rgb(56, 56, 56);
-  background: transparent;
+  top: 15px;
+  right: 15px;
+  font-size: 2rem;
+  color: #fff;
+  background: none;
   border: none;
   cursor: pointer;
 }
 
-.prevButton, .nextButton {
-  background: rgba(255, 255, 255, 0.8);
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 24px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
+.floatingMessageButton {
   position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1001;
-}
-
-.prevButton {
-  left: 20px;
-}
-
-.nextButton {
-  right: 20px;
-}
-
-.prevButton:hover, .nextButton:hover {
-  background: white;
-}
-
-
-.contactGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.contactInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.contactActions {
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  bottom: 30px;
+  right: 30px;
+  z-index: 100;
 }
 
 .chatButton {
   background: #007bff;
-  color: white;
+  color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 10px 15px;
+  border-radius: 50px;
+  padding: 12px 25px;
   font-size: 1rem;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  gap: 8px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease;
 }
 
 .chatButton:hover {
-  background: #0069d9;
-}
-
-.ownListingNotice {
-  padding: 10px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  color: #6c757d;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  background: #0056b3;
+  transform: translateY(-2px);
 }
