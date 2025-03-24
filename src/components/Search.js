@@ -3,6 +3,8 @@ import { db } from "../config/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import FavoriteButton from "./Favorites/FavoriteButton";
+import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { useAuth } from "../contexts/AuthContext";
 import {
   GoogleMap,
   useLoadScript,
@@ -26,7 +28,7 @@ const Search = () => {
   const [selectedListing, setSelectedListing] = useState(null);
   const navigate = useNavigate();
   const location = new URLSearchParams(window.location.search).get("location");
-
+  const { user } = useAuth();
   const [infoWindowClosing, setInfoWindowClosing] = useState(false);
 
   const handleInfoWindowMouseLeave = () => {
@@ -71,26 +73,93 @@ const Search = () => {
     instant: false,
   });
 
+  const [alertSettings, setAlertSettings] = useState({
+    enabled: false,
+    minBudget: "",
+    maxBudget: "",
+    location: "",
+  });
+
+  useEffect(() => {
+    const fetchAlertSettings = async () => {
+      if (!user) return;
+
+      try {
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          setAlertSettings({
+            enabled: userData.alertsEnabled || false,
+            minBudget: userData.alertsMinBudget || "",
+            maxBudget: userData.alertsMaxBudget || "",
+            location: userData.alertsLocation || "",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching alert settings:", error);
+      }
+    };
+
+    fetchAlertSettings();
+  }, [user]);
+
+
+const saveAlertSettings = async () => {
+  if (!user) {
+    alert("Veuillez vous connecter pour configurer des alertes");
+    return;
+  }
+
+  try {
+    const minBudget = alertSettings.minBudget ? parseFloat(alertSettings.minBudget) : 0;
+    const maxBudget = alertSettings.maxBudget ? 
+                      parseFloat(alertSettings.maxBudget) : 
+                      (filters.maxPrice ? parseFloat(filters.maxPrice) : 10000);
+
+    console.log("Saving alert settings:", {
+      enabled: alertSettings.enabled,
+      minBudget,
+      maxBudget,
+      location: alertSettings.location || filters.location || ""
+    });
+
+    const userDocRef = doc(db, "users", user.uid);
+    await updateDoc(userDocRef, {
+      alertsEnabled: alertSettings.enabled,
+      alertsMinBudget: minBudget,
+      alertsMaxBudget: maxBudget,
+      alertsLocation: alertSettings.location || filters.location || "",
+      updatedAt: serverTimestamp(),
+    });
+
+    alert("Paramètres d'alerte sauvegardés avec succès!");
+  } catch (error) {
+    console.error("Error saving alert settings:", error);
+    alert("Erreur lors de la sauvegarde des paramètres d'alerte");
+  }
+};
   useEffect(() => {
     const initialize = async () => {
       console.log("Initializing search component");
       const listingsData = await fetchListings();
-      
+
       if (listingsData.length > 0) {
         console.log("Listings loaded, applying filters");
         applyFilters(listingsData);
       }
     };
-    
+
     initialize();
-  }, []); 
+  }, []);
 
   useEffect(() => {
     if (location) {
       console.log("URL location parameter found:", location);
-      setFilters(prev => ({
+      setFilters((prev) => ({
         ...prev,
-        location: location
+        location: location,
       }));
     }
   }, [location]);
@@ -119,7 +188,6 @@ const Search = () => {
       }
     }
   }, [filteredListings]);
-
 
   const geocodeAddress = async (address) => {
     if (!address || address.trim() === "") {
@@ -161,33 +229,33 @@ const Search = () => {
       const listingsData = await Promise.all(
         querySnapshot.docs.map(async (doc, index) => {
           const data = doc.data();
-  
+
           if (
             !data.location?.coordinates ||
             !data.location.coordinates.lat ||
             !data.location.coordinates.lng
           ) {
             await new Promise((resolve) => setTimeout(resolve, index * 200));
-  
+
             const address = `${data.location?.street || ""}, ${
               data.location?.city || ""
             }, ${data.location?.country || ""}`;
-  
+
             try {
               let coordinates = await geocodeAddress(address);
-  
+
               if (!coordinates && data.location?.city) {
                 const simplifiedAddress = `${data.location.city}, ${
                   data.location?.country || ""
                 }`;
                 coordinates = await geocodeAddress(simplifiedAddress);
               }
-  
+
               // Use coordinates or default to Nice
               data.location = data.location || {};
               data.location.coordinates = coordinates || {
                 lat: 43.7102,
-                lng: 7.2620,
+                lng: 7.262,
               };
             } catch (error) {
               console.error("Error during geocoding in fetchListings:", error);
@@ -195,16 +263,16 @@ const Search = () => {
               data.location.coordinates = { lat: 48.8566, lng: 2.3522 };
             }
           }
-  
+
           return {
             id: doc.id,
             ...data,
           };
         })
       );
-  
+
       setListings(listingsData);
-      return listingsData; 
+      return listingsData;
     } catch (error) {
       console.error("Error fetching listings:", error);
       return [];
@@ -238,11 +306,11 @@ const Search = () => {
   };
 
   const applyFilters = (listingsToFilter = listings) => {
-    console.log('Applying filters - Listings count:', listingsToFilter.length);
-    console.log('Current location filter:', filters.location);
-    
+    console.log("Applying filters - Listings count:", listingsToFilter.length);
+    console.log("Current location filter:", filters.location);
+
     let filtered = [...listingsToFilter];
-  
+
     if (filters.location) {
       filtered = filtered.filter((listing) => {
         const cityMatch =
@@ -255,48 +323,48 @@ const Search = () => {
             ?.includes(filters.location.toLowerCase()) || false;
         return cityMatch || countryMatch;
       });
-      
-      console.log('After location filtering - Results:', filtered.length);
+
+      console.log("After location filtering - Results:", filtered.length);
     }
-  
+
     if (filters.minPrice) {
       filtered = filtered.filter(
         (listing) => listing.details?.rent >= parseInt(filters.minPrice)
       );
     }
-  
+
     if (filters.maxPrice) {
       filtered = filtered.filter(
         (listing) => listing.details?.rent <= parseInt(filters.maxPrice)
       );
     }
-  
+
     if (filters.maxBudget) {
       filtered = filtered.filter(
         (listing) => listing.details?.rent <= parseInt(filters.maxBudget)
       );
     }
-  
+
     if (filters.propertyType) {
       filtered = filtered.filter(
         (listing) => listing.details?.propertyType === filters.propertyType
       );
     }
-  
+
     // Filtre par date de disponibilité
     if (filters.availableFrom) {
       filtered = filtered.filter(
         (listing) => listing.details?.availableDate >= filters.availableFrom
       );
     }
-  
+
     // Filtre par amenités
     Object.entries(filters.amenities).forEach(([amenity, isRequired]) => {
       if (isRequired) {
         filtered = filtered.filter((listing) => listing.services?.[amenity]);
       }
     });
-  
+
     // Tri
     switch (filters.sortBy) {
       case "priceAsc":
@@ -317,7 +385,7 @@ const Search = () => {
       default:
         break;
     }
-  
+
     setFilteredListings(filtered);
   };
 
@@ -377,7 +445,6 @@ const Search = () => {
             <h3>
               <i className="fas fa-filter"></i> Filters
             </h3>
-
             <div className="filter-group">
               <label>
                 <i className="fas fa-map-marker-alt"></i> Location
@@ -391,7 +458,6 @@ const Search = () => {
                 className="filter-input"
               />
             </div>
-
             <div className="filter-group">
               <label>
                 <i className="fas fa-euro-sign"></i> Price Range
@@ -416,7 +482,6 @@ const Search = () => {
                 />
               </div>
             </div>
-
             <div className="filter-group">
               <label>
                 <i className="fas fa-calendar-alt"></i> Available From
@@ -429,7 +494,6 @@ const Search = () => {
                 className="filter-input"
               />
             </div>
-
             <div className="filter-group">
               <label>
                 <i className="fas fa-home"></i> Property Type
@@ -446,7 +510,6 @@ const Search = () => {
                 <option value="studio">Studio</option>
               </select>
             </div>
-
             <div className="amenities-section">
               <h4>
                 <i className="fas fa-concierge-bell"></i> Amenities
@@ -466,7 +529,6 @@ const Search = () => {
                 ))}
               </div>
             </div>
-
             <div className="additional-filters">
               <label className="toggle-filter">
                 <input
@@ -478,6 +540,135 @@ const Search = () => {
                 <i className="fas fa-bolt"></i>
                 <span className="toggle-label">Instant Booking</span>
               </label>
+            </div>
+            <div className="additional-filters">
+              <label className="toggle-filter">
+                <input
+                  type="checkbox"
+                  name="instant"
+                  checked={filters.instant}
+                  onChange={handleFilterChange}
+                />
+                <i className="fas fa-bolt"></i>
+                <span className="toggle-label">Instant Booking</span>
+              </label>
+            </div>
+            <div className="filters-section alerts-section">
+              <h3>
+                <i className="fas fa-bell"></i> Alertes
+              </h3>
+              {user ? (
+                <>
+                  <div className="alert-toggle">
+                    <label className="toggle-label">
+                      <input
+                        type="checkbox"
+                        checked={alertSettings.enabled}
+                        onChange={(e) =>
+                          setAlertSettings((prev) => ({
+                            ...prev,
+                            enabled: e.target.checked,
+                          }))
+                        }
+                      />
+                      <span className="toggle-switch"></span>
+                      Recevoir des alertes
+                    </label>
+                  </div>
+
+                  {alertSettings.enabled && (
+                    <>
+                      <button
+                        onClick={() => {
+                          setAlertSettings({
+                            ...alertSettings,
+                            enabled: true,
+                            minBudget: filters.minPrice || "",
+                            maxBudget:
+                              filters.maxPrice || filters.maxBudget || "",
+                            location: filters.location || "",
+                          });
+                        }}
+                        className="secondary-button use-filters-button"
+                      >
+                        <i className="fas fa-filter"></i> Utiliser les filtres
+                        actuels
+                      </button>
+
+                      <div className="filter-group">
+                        <label>
+                          <i className="fas fa-euro-sign"></i> Budget min-max
+                          (€)
+                        </label>
+                        <div className="budget-inputs">
+                          <input
+                            type="number"
+                            placeholder="Min"
+                            value={alertSettings.minBudget}
+                            onChange={(e) =>
+                              setAlertSettings((prev) => ({
+                                ...prev,
+                                minBudget: e.target.value,
+                              }))
+                            }
+                            className="form-input"
+                          />
+                          <input
+                            type="number"
+                            placeholder="Max"
+                            value={alertSettings.maxBudget}
+                            onChange={(e) =>
+                              setAlertSettings((prev) => ({
+                                ...prev,
+                                maxBudget: e.target.value,
+                              }))
+                            }
+                            className="form-input"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="filter-group">
+                        <label>
+                          <i className="fas fa-map-marker-alt"></i> Ville
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Ville"
+                          value={alertSettings.location}
+                          onChange={(e) =>
+                            setAlertSettings((prev) => ({
+                              ...prev,
+                              location: e.target.value,
+                            }))
+                          }
+                          className="form-input"
+                        />
+                      </div>
+
+                      <button
+                        onClick={saveAlertSettings}
+                        className="primary-button alert-save-button"
+                      >
+                        <i className="fas fa-save"></i> Enregistrer l'alerte
+                      </button>
+
+                      <p className="alert-info">
+                        <i className="fas fa-info-circle"></i>
+                        Vous serez alerté lorsque de nouvelles annonces
+                        correspondant à vos critères seront publiées.
+                      </p>
+                    </>
+                  )}
+                </>
+              ) : (
+                <p className="alert-login-message">
+                  <a href="/login" className="alert-login-link">
+                    Connectez-vous
+                  </a>{" "}
+                  pour configurer des alertes
+                </p>
+              )}
             </div>
           </div>
         </aside>
@@ -577,7 +768,6 @@ const Search = () => {
                           ).toLocaleDateString()
                         : "Unknown date"}
                     </div>
-
                     <div className="listing-author">
                       <img
                         src={

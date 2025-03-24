@@ -508,6 +508,112 @@
   animation: fadeOut 0.3s ease-out forwards;
 }
 
+.alerts-section {
+  margin-top: 30px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 20px;
+}
+
+.alert-toggle {
+  margin-bottom: 16px;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-label input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+  background-color: #ccc;
+  border-radius: 24px;
+  margin-right: 10px;
+  transition: .4s;
+}
+
+.toggle-switch:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: .4s;
+}
+
+.toggle-label input:checked + .toggle-switch {
+  background-color: #6C63FF;
+}
+
+.toggle-label input:checked + .toggle-switch:before {
+  transform: translateX(26px);
+}
+
+.budget-inputs {
+  display: flex;
+  gap: 10px;
+}
+
+.budget-inputs input {
+  flex: 1;
+}
+
+.alert-save-button {
+  width: 100%;
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alert-save-button i {
+  margin-right: 8px;
+}
+
+.alert-info {
+  font-size: 12px;
+  color: #666;
+  margin-top: 16px;
+  line-height: 1.4;
+}
+
+.alert-info i {
+  color: #6C63FF;
+  margin-right: 5px;
+}
+
+.alert-login-message {
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+  padding: 10px;
+}
+
+.alert-login-link {
+  color: #6C63FF;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.alert-login-link:hover {
+  text-decoration: underline;
+}
+
 @keyframes fadeOut {
   from { opacity: 1; }
   to { opacity: 0; }

@@ -210,3 +210,45 @@
   font-weight: bold;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
+
+.notification-button {
+  position: relative;
+  padding: 8px 15px;
+  margin-right: 10px;
+  background-color: transparent;
+  border: 1px solid #6C63FF;
+  color: #6C63FF;
+}
+
+.notification-button:hover {
+  background-color: #f0f0ff;
+}
+
+.nav-notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #FF6B6B;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 5px rgba(255, 107, 107, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+  }
+}

@@ -159,6 +159,16 @@ textarea.form-input {
   border-radius: 16px; /* Consistent radius */
 }
 
+.user-name {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: #2A265F;
+  margin-top: 10px;
+  margin-bottom: 12px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+}
 .verification-status {
   font-family: 'Inter', 'Segoe UI', sans-serif;
   display: flex;
@@ -210,6 +220,84 @@ textarea.form-input {
   border-radius: 16px; /* Consistent radius */
   border: 1px solid #EFF0FF;
   box-shadow: 0 4px 8px rgba(108, 99, 255, 0.1);
+}
+
+.budget-range {
+  margin-bottom: 16px;
+}
+
+.budget-inputs {
+  display: flex;
+  gap: 16px;
+}
+
+.input-group {
+  flex: 1;
+}
+
+.input-label {
+  display: block;
+  margin-bottom: 4px;
+  color: #555;
+  font-size: 14px;
+}
+
+.alert-section {
+  margin-top: 24px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 24px;
+}
+
+.alert-toggle {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-label input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+  background-color: #ccc;
+  border-radius: 24px;
+  margin-right: 10px;
+  transition: .4s;
+}
+
+.toggle-switch:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: .4s;
+}
+
+.toggle-label input:checked + .toggle-switch {
+  background-color: #6C63FF;
+}
+
+.toggle-label input:checked + .toggle-switch:before {
+  transform: translateX(26px);
 }
 
 @media (max-width: 768px) {

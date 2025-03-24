@@ -79,7 +79,7 @@ const Profile = () => {
     try {
       const userRef = doc(db, "users", auth.currentUser.uid);
       const userSnap = await getDoc(userRef);
-
+  
       if (userSnap.exists()) {
         const userData = userSnap.data();
         setProfile((prev) => ({
@@ -92,6 +92,8 @@ const Profile = () => {
           location: userData.location || "",
           housingType: userData.housingType || "",
           description: userData.description || "",
+          studentCard: userData.studentCardURL || "",
+          isVerified: userData.isVerified || false,
         }));
       }
     } catch (error) {
@@ -139,6 +141,12 @@ const Profile = () => {
 
       await updateProfile(auth.currentUser, {
         photoURL: cloudinaryData.secure_url,
+      });
+
+      const userRef = doc(db, "users", auth.currentUser.uid);
+      await updateDoc(userRef, {
+        photoURL: cloudinaryData.secure_url,
+        updatedAt: serverTimestamp(),
       });
 
       setProfile((prev) => ({ ...prev, photoURL: cloudinaryData.secure_url }));
@@ -218,6 +226,7 @@ const Profile = () => {
               e.target.src = "/images/default-avatar.png";
             }}
           />
+          <h3 className="user-name">{auth.currentUser?.displayName || 'Utilisateur'}</h3>
           <input
             type="file"
             accept="image/*"
