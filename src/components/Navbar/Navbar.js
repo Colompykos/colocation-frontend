@@ -172,13 +172,6 @@ const Navbar = () => {
                   </div>
                   <div
                     className="user-menu-item"
-                    onClick={() => navigate("/applications")}
-                  >
-                    <i className="fas fa-clipboard-list"></i>
-                    Mes Candidatures
-                  </div>
-                  <div
-                    className="user-menu-item"
                     onClick={() => navigate("/favorites")}
                   >
                     <i className="fas fa-heart"></i>

@@ -343,13 +343,13 @@ const getAmenityIcon = (amenity) => {
     handicapAccess: "wheelchair",
     kitchenware: "utensils",
     microwave: "microwave",
-    laundry: "washing-machine",
+    laundry: "soap",
     bikeParking: "bicycle",
     linens: "bed",
-    washingMachine: "washing-machine",
+    washingMachine: "soap",
     tv: "tv",
     doubleBed: "bed",
-    elevator: "elevator",
+    elevator: "door-open",
     parking: "parking",
   };
   return icons[amenity] || "check";
