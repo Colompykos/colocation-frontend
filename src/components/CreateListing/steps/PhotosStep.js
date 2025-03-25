@@ -14,11 +14,14 @@ const PhotosStep = ({ formData, setFormData }) => {
         alert('Maximum 10 photos allowed');
         return;
       }
+      
       const newPhotos = acceptedFiles.map(file => 
         Object.assign(file, {
-          preview: URL.createObjectURL(file)
+          preview: URL.createObjectURL(file),
+          isExisting: false // Marquer comme nouvelle photo
         })
       );
+      
       setFormData(prev => ({
         ...prev,
         photos: [...prev.photos, ...newPhotos].slice(0, 10)
@@ -46,7 +49,6 @@ const PhotosStep = ({ formData, setFormData }) => {
               <img 
                 src={photo.preview} 
                 alt={`Preview ${index + 1}`}
-                onLoad={() => { URL.revokeObjectURL(photo.preview) }}
               />
               <button
                 type="button"
@@ -60,6 +62,12 @@ const PhotosStep = ({ formData, setFormData }) => {
               >
                 ×
               </button>
+              
+              {photo.isExisting && (
+                <div className="existing-photo-badge">
+                  Photo existante
+                </div>
+              )}
             </div>
           ))}
         </div>

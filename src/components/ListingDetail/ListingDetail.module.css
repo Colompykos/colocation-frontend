@@ -273,6 +273,86 @@
   transform: translateY(-50%);
   z-index: 1001;
 }
+.errorContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;
+  padding: 2rem;
+}
+
+.errorBox {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+}
+
+.errorBox i {
+  font-size: 3rem;
+  color: #f44336;
+  margin-bottom: 1rem;
+}
+
+.errorBox h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.errorBox p {
+  margin-bottom: 1.5rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+.returnButton {
+  background-color: #4C86F9;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: background-color 0.2s;
+  margin-right: 1rem;
+}
+
+.returnButton i {
+  font-size: 0.9rem;
+  color: white;
+  margin-right: 0.5rem;
+  margin-bottom: 0;
+}
+
+.contactLink {
+  display: inline-flex;
+  align-items: center;
+  color: #4C86F9;
+  text-decoration: none;
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+.contactLink i {
+  font-size: 0.9rem;
+  color: #4C86F9;
+  margin-right: 0.5rem;
+  margin-bottom: 0;
+}
+
+.returnButton:hover {
+  background-color: #3a6ad0;
+}
+
+.contactLink:hover {
+  text-decoration: underline;
+}
 
 .prevButton {
   left: 20px;

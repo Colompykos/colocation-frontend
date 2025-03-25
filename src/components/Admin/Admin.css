@@ -240,8 +240,24 @@
   background: var(--warning);
 }
 
-.delete-button {
-  background: var(--danger);
+.admin-delete-btn {
+  background: #ef4444;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  position: relative;
+}
+
+.admin-delete-btn:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
 }
 
 .actions-cell button:hover {
@@ -320,6 +336,32 @@
   color: var(--text-dark);
   font-style: italic;
   font-size: 0.875rem;
+}
+
+.actions-cell .delete-button {
+  background: var(--danger);
+  width: 40px !important;
+  height: 40px;
+  border: none;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: white;
+  box-shadow: var(--shadow-sm);
+  flex: none !important;
+}
+
+.actions-cell .delete-button:hover {
+  transform: translateY(-2px);
+  background: #dc2626;
+}
+
+.actions-cell .delete-button i {
+  font-size: 1rem;
+  color: white;
 }
 
 /* Responsive */
