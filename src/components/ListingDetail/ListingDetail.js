@@ -18,6 +18,7 @@ const ListingDetail = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [reported, setReported] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -45,26 +46,44 @@ const ListingDetail = () => {
       try {
         setLoading(true);
         const listingSnap = await getDoc(doc(db, "listings", id));
+
         if (listingSnap.exists()) {
           const listingData = { id: listingSnap.id, ...listingSnap.data() };
-          if (listingData.status === "blocked" && !isAdmin) {
-            navigate("/not-found");
+
+          if (listingData.status === "blocked") {
+            setListing(null);
+            setError(
+              "Cette annonce a été bloquée par un administrateur. Veuillez contacter l'équipe de support à support@miagecoloc.com."
+            );
             return;
           }
+
+          if (listingData.status === "pending" && !isAdmin) {
+            setListing(null);
+            setError(
+              "Cette annonce est en cours de vérification par nos équipes."
+            );
+            return;
+          }
+
           setListing(listingData);
           setReported(checkIfReported(listingData));
         } else {
-          navigate("/not-found");
+          setListing(null);
+          setError(
+            "L'annonce que vous recherchez n'existe pas ou a été supprimée."
+          );
         }
       } catch (error) {
         console.error("Error fetching listing:", error);
+        setError("Une erreur est survenue lors du chargement de l'annonce.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchListing();
-  }, [id, navigate, isAdmin, user]);
+  }, [id, navigate, isAdmin]);
 
   const handleReport = async () => {
     if (!user) {
@@ -134,6 +153,25 @@ const ListingDetail = () => {
   if (loading) {
     return <div className={styles.loadingState}>Loading...</div>;
   }
+  if (error) {
+    return (
+      <div className={styles.errorContainer}>
+        <div className={styles.errorBox}>
+          <i className="fas fa-exclamation-circle"></i>
+          <h2>Annonce non disponible</h2>
+          <p>{error}</p>
+          <button onClick={() => navigate("/search")} className={styles.returnButton}>
+            <i className="fas fa-arrow-left"></i> Retour aux annonces
+          </button>
+          {error.includes("bloquée") && (
+            <a href="mailto:support@miagecoloc.com" className={styles.contactLink}>
+              <i className="fas fa-envelope"></i> Contacter l'administrateur
+            </a>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   if (!listing) {
     return <div className={styles.errorState}>Listing not found</div>;
@@ -184,8 +222,9 @@ const ListingDetail = () => {
               key={index}
               src={photo}
               alt={`Thumbnail ${index + 1}`}
-              className={`${styles.thumbnail} ${currentPhotoIndex === index ? styles.activeThumbnail : ""
-                }`}
+              className={`${styles.thumbnail} ${
+                currentPhotoIndex === index ? styles.activeThumbnail : ""
+              }`}
               onClick={() => setCurrentPhotoIndex(index)}
             />
           ))}
@@ -276,9 +315,15 @@ const ListingDetail = () => {
         <div className={styles.contactSection}>
           <h3>Contact</h3>
           <div className={styles.contactInfo}>
-            <p><i className="fas fa-user"></i> {listing.contact.name}</p>
-            <p><i className="fas fa-phone"></i> {listing.contact.phone}</p>
-            <p><i className="fas fa-envelope"></i> {listing.contact.email}</p>
+            <p>
+              <i className="fas fa-user"></i> {listing.contact.name}
+            </p>
+            <p>
+              <i className="fas fa-phone"></i> {listing.contact.phone}
+            </p>
+            <p>
+              <i className="fas fa-envelope"></i> {listing.contact.email}
+            </p>
           </div>
         </div>
 
@@ -286,7 +331,9 @@ const ListingDetail = () => {
           <div className={styles.floatingMessageButton}>
             <button
               className={styles.chatButton}
-              onClick={() => navigate(`/messages?recipientId=${listing.metadata.userId}`)}
+              onClick={() =>
+                navigate(`/messages?recipientId=${listing.metadata.userId}`)
+              }
             >
               <i className="fas fa-comments"></i> Message
             </button>
@@ -325,10 +372,7 @@ const ListingDetail = () => {
                 >
                   ‹
                 </button>
-                <button
-                  onClick={handleSwipeLeft}
-                  className={styles.nextButton}
-                >
+                <button onClick={handleSwipeLeft} className={styles.nextButton}>
                   ›
                 </button>
               </>
