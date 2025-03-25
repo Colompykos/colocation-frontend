@@ -50,6 +50,14 @@ const Alerts = () => {
   useEffect(() => {
     const fetchAlerts = async () => {
       if (!user || !userPreferences) {
+        setAlerts([]);
+        setLoading(false);
+        return;
+      }
+
+      if (userPreferences.alertsEnabled !== true) {
+        console.log("Alerts are disabled, clearing alerts list");
+        setAlerts([]); 
         setLoading(false);
         return;
       }
@@ -58,9 +66,7 @@ const Alerts = () => {
       console.log("Fetching alerts with preferences:", userPreferences);
 
       try {
-        // Récupérer toutes les annonces actives
         const listingsRef = collection(db, "listings");
-        // Simplifions la requête pour être sûrs de récupérer toutes les annonces
         const q = query(listingsRef);
 
         const querySnapshot = await getDocs(q);
@@ -76,13 +82,11 @@ const Alerts = () => {
             }`
           );
 
-          // Filtrage moins strict: vérifie juste que l'annonce est active
           if (listing.status !== "active") {
             console.log(`Listing ${listing.id} excluded: not active`);
             return;
           }
 
-          // Convertir les valeurs numériques pour éviter les problèmes de comparaison
           const rent = parseFloat(listing.details?.rent) || 0;
           const minBudget = parseFloat(userPreferences.alertsMinBudget) || 0;
           const maxBudget =
@@ -92,7 +96,6 @@ const Alerts = () => {
             `Listing rent: ${rent}, Min: ${minBudget}, Max: ${maxBudget}`
           );
 
-          // Vérifier le budget seulement si les deux valeurs sont définies
           if (minBudget > 0 && rent < minBudget) {
             console.log(`Listing ${listing.id} excluded: rent too low`);
             return;
@@ -103,7 +106,6 @@ const Alerts = () => {
             return;
           }
 
-          // Filtrer par localisation si spécifiée - moins strict
           if (
             userPreferences.alertsLocation &&
             userPreferences.alertsLocation.trim() !== ""
@@ -112,7 +114,6 @@ const Alerts = () => {
             const preferredLocation =
               userPreferences.alertsLocation.toLowerCase();
 
-            // Utiliser includes au lieu de l'égalité exacte
             if (!listingCity.includes(preferredLocation)) {
               console.log(`Listing ${listing.id} excluded: location mismatch`);
               return;
@@ -125,9 +126,7 @@ const Alerts = () => {
 
         console.log(`Found ${matchingListings.length} matching listings`);
 
-        // Trier par date de création (plus récent d'abord)
         matchingListings.sort((a, b) => {
-          // Traitement plus souple pour les dates
           const dateA = getDate(a);
           const dateB = getDate(b);
 
@@ -142,7 +141,6 @@ const Alerts = () => {
       }
     };
 
-    // Helper function to extract date from listings safely
     const getDate = (listing) => {
       if (!listing.metadata?.createdAt) return new Date();
 
@@ -190,13 +188,13 @@ const Alerts = () => {
     );
   }
 
-  if (!userPreferences?.alertsEnabled) {
+  if (!userPreferences || userPreferences.alertsEnabled !== true) {
     return (
       <div className="alerts-container">
         <h2>Alertes désactivées</h2>
         <p>
-          Activez les alertes dans votre profil pour recevoir des notifications
-          sur les nouvelles annonces qui correspondent à vos critères.
+          Activez les alertes pour recevoir des notifications sur les nouvelles
+          annonces qui correspondent à vos critères.
         </p>
         <button onClick={() => navigate("/search")} className="primary-button">
           Configurer les alertes

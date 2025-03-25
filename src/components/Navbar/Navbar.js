@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import {
@@ -9,7 +9,6 @@ import {
   where,
   getDocs,
   onSnapshot,
-  Timestamp,
 } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { getAuth, signOut } from "firebase/auth";
@@ -35,6 +34,92 @@ const Navbar = () => {
       console.error("Logout error:", error);
     }
   };
+
+  const checkAlerts = useCallback(async () => {
+    if (!user) {
+      setAlertsCount(0);
+      return;
+    }
+
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (!userDocSnap.exists() || !userDocSnap.data().alertsEnabled) {
+        setAlertsCount(0);
+        return;
+      }
+
+      const preferences = userDocSnap.data();
+      const minBudget = parseFloat(preferences.alertsMinBudget) || 0;
+      const maxBudget = parseFloat(preferences.alertsMaxBudget) || 10000;
+      const location = preferences.alertsLocation || "";
+
+      console.log("Checking alerts with preferences:", {
+        minBudget,
+        maxBudget,
+        location,
+      });
+
+      const listingsRef = collection(db, "listings");
+      const q = query(listingsRef);
+
+      const querySnapshot = await getDocs(q);
+      console.log(`Retrieved ${querySnapshot.size} total listings for alerts check`);
+
+      let count = 0;
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      querySnapshot.forEach((doc) => {
+        const listing = doc.data();
+
+        if (listing.status !== "active") {
+          return;
+        }
+
+        let creationDate;
+        if (listing.metadata?.createdAt) {
+          if (listing.metadata.createdAt.toDate) {
+            creationDate = listing.metadata.createdAt.toDate();
+          } else if (listing.metadata.createdAt.seconds) {
+            creationDate = new Date(
+              listing.metadata.createdAt.seconds * 1000
+            );
+          } else if (typeof listing.metadata.createdAt === "string") {
+            creationDate = new Date(listing.metadata.createdAt);
+          }
+        }
+
+        if (creationDate && creationDate < sevenDaysAgo) {
+          return;
+        }
+
+        const rent = parseFloat(listing.details?.rent) || 0;
+        if (minBudget > 0 && rent < minBudget) {
+          return;
+        }
+
+        if (maxBudget > 0 && rent > maxBudget) {
+          return;
+        }
+
+        if (location && listing.location?.city) {
+          const listingCity = listing.location.city.toLowerCase();
+          if (!listingCity.includes(location.toLowerCase())) {
+            return;
+          }
+        }
+
+        count++;
+      });
+
+      console.log(`Found ${count} listings matching alert criteria`);
+      setAlertsCount(count);
+    } catch (error) {
+      console.error("Error checking alerts:", error);
+    }
+  }, [user]); 
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -123,94 +208,30 @@ const Navbar = () => {
       return;
     }
 
-    const checkAlerts = async () => {
-      try {
-        const userDocRef = doc(db, "users", user.uid);
-        const userDocSnap = await getDoc(userDocRef);
-
-        if (!userDocSnap.exists() || !userDocSnap.data().alertsEnabled) {
-          setAlertsCount(0);
-          return;
-        }
-
-        const preferences = userDocSnap.data();
-        const minBudget = parseFloat(preferences.alertsMinBudget) || 0;
-        const maxBudget = parseFloat(preferences.alertsMaxBudget) || 10000;
-        const location = preferences.alertsLocation || "";
-
-        console.log("Checking alerts with preferences:", {
-          minBudget,
-          maxBudget,
-          location,
-        });
-
-        const listingsRef = collection(db, "listings");
-        const q = query(listingsRef);
-
-        const querySnapshot = await getDocs(q);
-        console.log(
-          `Retrieved ${querySnapshot.size} total listings for alerts check`
-        );
-
-        let count = 0;
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-        querySnapshot.forEach((doc) => {
-          const listing = doc.data();
-
-          if (listing.status !== "active") {
-            return;
-          }
-
-          let creationDate;
-          if (listing.metadata?.createdAt) {
-            if (listing.metadata.createdAt.toDate) {
-              creationDate = listing.metadata.createdAt.toDate();
-            } else if (listing.metadata.createdAt.seconds) {
-              creationDate = new Date(
-                listing.metadata.createdAt.seconds * 1000
-              );
-            } else if (typeof listing.metadata.createdAt === "string") {
-              creationDate = new Date(listing.metadata.createdAt);
-            }
-          }
-
-          if (creationDate && creationDate < sevenDaysAgo) {
-            return;
-          }
-
-          const rent = parseFloat(listing.details?.rent) || 0;
-          if (minBudget > 0 && rent < minBudget) {
-            return;
-          }
-
-          if (maxBudget > 0 && rent > maxBudget) {
-            return;
-          }
-
-          if (location && listing.location?.city) {
-            const listingCity = listing.location.city.toLowerCase();
-            if (!listingCity.includes(location.toLowerCase())) {
-              return;
-            }
-          }
-
-          count++;
-        });
-
-        console.log(`Found ${count} listings matching alert criteria`);
-        setAlertsCount(count);
-      } catch (error) {
-        console.error("Error checking alerts:", error);
-      }
-    };
     checkAlerts();
 
     const intervalId = setInterval(checkAlerts, 60 * 60 * 1000);
 
     return () => clearInterval(intervalId);
-  }, [user]);
+  }, [user, checkAlerts]); 
+
+  useEffect(() => {
+    const handleAlertSettingsChange = (event) => {
+      if (!event.detail.enabled) {
+        console.log("Alertes désactivées, réinitialisation du compteur");
+        setAlertsCount(0);
+      } else {
+        console.log("Alertes activées, vérification des nouvelles alertes");
+        checkAlerts(); 
+      }
+    };
+    
+    window.addEventListener('alertSettingsChanged', handleAlertSettingsChange);
+    
+    return () => {
+      window.removeEventListener('alertSettingsChanged', handleAlertSettingsChange);
+    };
+  }, [checkAlerts]); 
 
   return (
     <nav className="navbar">
