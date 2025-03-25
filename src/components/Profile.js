@@ -115,17 +115,17 @@ const Profile = () => {
   const handlePhotoUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
+  
     try {
       setIsLoading(true);
-
+  
       const formData = new FormData();
       formData.append("file", file);
       formData.append(
         "upload_preset",
         process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
       );
-
+  
       const cloudinaryResponse = await fetch(
         process.env.REACT_APP_CLOUDINARY_URL,
         {
@@ -133,22 +133,38 @@ const Profile = () => {
           body: formData,
         }
       );
-
+  
       const cloudinaryData = await cloudinaryResponse.json();
       if (!cloudinaryData.secure_url) {
         throw new Error("Failed to upload to Cloudinary");
       }
-
+  
       await updateProfile(auth.currentUser, {
         photoURL: cloudinaryData.secure_url,
       });
-
+  
       const userRef = doc(db, "users", auth.currentUser.uid);
-      await updateDoc(userRef, {
-        photoURL: cloudinaryData.secure_url,
-        updatedAt: serverTimestamp(),
-      });
-
+      const userDoc = await getDoc(userRef);
+  
+      if (!userDoc.exists()) {
+        // Create the user document if it doesn't exist
+        await setDoc(userRef, {
+          displayName: auth.currentUser.displayName,
+          email: auth.currentUser.email,
+          photoURL: cloudinaryData.secure_url,
+          status: 'pending',
+          isVerified: false,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+      } else {
+        // Update the existing document
+        await updateDoc(userRef, {
+          photoURL: cloudinaryData.secure_url,
+          updatedAt: serverTimestamp(),
+        });
+      }
+  
       setProfile((prev) => ({ ...prev, photoURL: cloudinaryData.secure_url }));
       setError("");
     } catch (err) {
