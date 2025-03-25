@@ -182,7 +182,7 @@ const AdminListings = () => {
                 </button>
                 <button
                   onClick={() => handleModerate(listing.id, "delete")}
-                  className="delete-button"
+                  className="admin-delete-btn"
                   data-tooltip="Supprimer"
                 >
                   <i className="fas fa-trash"></i>

@@ -102,6 +102,139 @@
   gap: 30px;
 }
 
+.listing-card-wrapper {
+  position: relative;
+  background-color: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.listing-card-wrapper:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.listing-card {
+  cursor: pointer;
+  flex-grow: 1;
+}
+
+.listing-status-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 2;
+}
+
+.status-indicator {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.status-indicator.active {
+  background-color: #10b981;
+}
+
+.status-indicator.pending {
+  background-color: #f59e0b;
+}
+
+.status-indicator.blocked {
+  background-color: #ef4444;
+}
+
+.listing-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  border-top: 1px solid #eee;
+}
+
+.edit-button, 
+.delete-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.edit-button {
+  background-color: #4C86F9;
+  color: white;
+  flex: 1;
+  margin-right: 8px;
+  justify-content: center;
+}
+
+.edit-button:hover {
+  background-color: #3a6ad0;
+}
+
+.edit-button:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+}
+
+.delete-button {
+  background-color: #ef4444;
+  color: white;
+  flex: 1;
+  margin-left: 8px;
+  justify-content: center;
+}
+
+.delete-button:hover {
+  background-color: #dc2626;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  margin: 40px auto 20px;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-left-color: #4C86F9;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  text-align: center;
+  color: #666;
+  margin-bottom: 40px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.no-listings {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.no-listings p {
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
 @media (max-width: 768px) {
   .my-listings-header {
     flex-direction: column;

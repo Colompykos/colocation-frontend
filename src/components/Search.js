@@ -112,7 +112,6 @@ const Search = () => {
     }
 
     try {
-      // Si les alertes sont désactivées, réinitialiser tous les paramètres
       if (!alertSettings.enabled) {
         console.log("Disabling alerts and resetting all settings");
 
@@ -125,7 +124,6 @@ const Search = () => {
           updatedAt: serverTimestamp(),
         });
 
-        // Réinitialiser les valeurs locales également
         setAlertSettings({
           enabled: false,
           minBudget: "",
@@ -133,7 +131,6 @@ const Search = () => {
           location: "",
         });
 
-        // Émettre un événement personnalisé pour informer la navbar de réinitialiser le compteur
         const event = new CustomEvent("alertSettingsChanged", {
           detail: { enabled: false },
         });
@@ -143,7 +140,6 @@ const Search = () => {
         return;
       }
 
-      // Si les alertes sont activées, enregistrer les paramètres
       const minBudget = alertSettings.minBudget
         ? parseFloat(alertSettings.minBudget)
         : 0;
@@ -596,18 +592,6 @@ const Search = () => {
                   </label>
                 ))}
               </div>
-            </div>
-            <div className="additional-filters">
-              <label className="toggle-filter">
-                <input
-                  type="checkbox"
-                  name="instant"
-                  checked={filters.instant}
-                  onChange={handleFilterChange}
-                />
-                <i className="fas fa-bolt"></i>
-                <span className="toggle-label">Instant Booking</span>
-              </label>
             </div>
             <div className="additional-filters">
               <label className="toggle-filter">
