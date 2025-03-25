@@ -254,3 +254,34 @@
   transform: translateY(-3px);
   box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
+
+
+.prevButton, .nextButton {
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1001;
+}
+
+.prevButton {
+  left: 20px;
+}
+
+.nextButton {
+  right: 20px;
+}
+
+.prevButton:hover, .nextButton:hover {
+  background: white;
+}
