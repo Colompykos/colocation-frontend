@@ -105,41 +105,109 @@ const Search = () => {
     fetchAlertSettings();
   }, [user]);
 
+  const saveAlertSettings = async () => {
+    if (!user) {
+      alert("Veuillez vous connecter pour configurer des alertes");
+      return;
+    }
 
-const saveAlertSettings = async () => {
-  if (!user) {
-    alert("Veuillez vous connecter pour configurer des alertes");
-    return;
-  }
+    try {
+      // Si les alertes sont désactivées, réinitialiser tous les paramètres
+      if (!alertSettings.enabled) {
+        console.log("Disabling alerts and resetting all settings");
 
-  try {
-    const minBudget = alertSettings.minBudget ? parseFloat(alertSettings.minBudget) : 0;
-    const maxBudget = alertSettings.maxBudget ? 
-                      parseFloat(alertSettings.maxBudget) : 
-                      (filters.maxPrice ? parseFloat(filters.maxPrice) : 10000);
+        const userDocRef = doc(db, "users", user.uid);
+        await updateDoc(userDocRef, {
+          alertsEnabled: false,
+          alertsMinBudget: 0,
+          alertsMaxBudget: 0,
+          alertsLocation: "",
+          updatedAt: serverTimestamp(),
+        });
 
-    console.log("Saving alert settings:", {
-      enabled: alertSettings.enabled,
-      minBudget,
-      maxBudget,
-      location: alertSettings.location || filters.location || ""
-    });
+        // Réinitialiser les valeurs locales également
+        setAlertSettings({
+          enabled: false,
+          minBudget: "",
+          maxBudget: "",
+          location: "",
+        });
 
-    const userDocRef = doc(db, "users", user.uid);
-    await updateDoc(userDocRef, {
-      alertsEnabled: alertSettings.enabled,
-      alertsMinBudget: minBudget,
-      alertsMaxBudget: maxBudget,
-      alertsLocation: alertSettings.location || filters.location || "",
-      updatedAt: serverTimestamp(),
-    });
+        // Émettre un événement personnalisé pour informer la navbar de réinitialiser le compteur
+        const event = new CustomEvent("alertSettingsChanged", {
+          detail: { enabled: false },
+        });
+        window.dispatchEvent(event);
 
-    alert("Paramètres d'alerte sauvegardés avec succès!");
-  } catch (error) {
-    console.error("Error saving alert settings:", error);
-    alert("Erreur lors de la sauvegarde des paramètres d'alerte");
-  }
-};
+        alert("Alertes désactivées avec succès!");
+        return;
+      }
+
+      // Si les alertes sont activées, enregistrer les paramètres
+      const minBudget = alertSettings.minBudget
+        ? parseFloat(alertSettings.minBudget)
+        : 0;
+      const maxBudget = alertSettings.maxBudget
+        ? parseFloat(alertSettings.maxBudget)
+        : filters.maxPrice
+        ? parseFloat(filters.maxPrice)
+        : 10000;
+
+      console.log("Saving alert settings:", {
+        enabled: true,
+        minBudget,
+        maxBudget,
+        location: alertSettings.location || filters.location || "",
+      });
+
+      const userDocRef = doc(db, "users", user.uid);
+      await updateDoc(userDocRef, {
+        alertsEnabled: true,
+        alertsMinBudget: minBudget,
+        alertsMaxBudget: maxBudget,
+        alertsLocation: alertSettings.location || filters.location || "",
+        updatedAt: serverTimestamp(),
+      });
+
+      const event = new CustomEvent("alertSettingsChanged", {
+        detail: {
+          enabled: true,
+          minBudget,
+          maxBudget,
+          location: alertSettings.location || filters.location || "",
+        },
+      });
+      window.dispatchEvent(event);
+
+      alert("Paramètres d'alerte sauvegardés avec succès!");
+    } catch (error) {
+      console.error("Error saving alert settings:", error);
+      alert("Erreur lors de la sauvegarde des paramètres d'alerte");
+    }
+  };
+
+
+  useEffect(() => {
+    const handleAlertToggle = (e) => {
+      if (!e.target.checked) {
+        saveAlertSettings();
+      }
+    };
+
+    const alertToggle = document.querySelector(
+      '.alert-toggle input[type="checkbox"]'
+    );
+    if (alertToggle) {
+      alertToggle.addEventListener("change", handleAlertToggle);
+    }
+
+    return () => {
+      if (alertToggle) {
+        alertToggle.removeEventListener("change", handleAlertToggle);
+      }
+    };
+  }, [alertSettings.enabled]);
+
   useEffect(() => {
     const initialize = async () => {
       console.log("Initializing search component");
@@ -564,12 +632,17 @@ const saveAlertSettings = async () => {
                       <input
                         type="checkbox"
                         checked={alertSettings.enabled}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const newEnabled = e.target.checked;
                           setAlertSettings((prev) => ({
                             ...prev,
-                            enabled: e.target.checked,
-                          }))
-                        }
+                            enabled: newEnabled,
+                          }));
+
+                          if (!newEnabled) {
+                            saveAlertSettings();
+                          }
+                        }}
                       />
                       <span className="toggle-switch"></span>
                       Recevoir des alertes
