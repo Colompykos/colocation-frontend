@@ -325,7 +325,10 @@ const ListingDetail = () => {
                 >
                   ‹
                 </button>
-                <button onClick={handleSwipeLeft} className={styles.nextButton}>
+                <button
+                  onClick={handleSwipeLeft}
+                  className={styles.nextButton}
+                >
                   ›
                 </button>
               </>
