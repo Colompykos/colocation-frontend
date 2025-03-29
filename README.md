@@ -26,7 +26,7 @@ npm install
 
 # Set up environment variables
 # Download the .env file from the following link and add it to the root of the project:
-# https://www.dropbox.com/scl/fo/ymsj675l2a1tz0gcxweje/AL5i5rh9fq1i3XYhEqvGG8U?rlkey=8ulhgbexrg99oktqur4jp0sni&st=stf7yvac&dl=0
+# https://www.dropbox.com/scl/fo/ymsj675l2a1tz0gcxweje/AL5i5rh9fq1i3XYhEqvGG8U?rlkey=8ulhgbexrg99oktqur4jp0sni&st=axyrgvfo&dl=0
 
 # Start the development server
 npm start
